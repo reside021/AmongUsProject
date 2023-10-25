@@ -1,16 +1,12 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
-
-
+using TMPro;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class MovePlayer : MonoBehaviour
 {
     public float MoveSpeed = 10f;
-
+    public TextMeshProUGUI NickNameInput;
 
     private MoveState _moveState = MoveState.Idle;
     private Rigidbody2D _rb;
@@ -25,6 +21,8 @@ public class MovePlayer : MonoBehaviour
         _rb = GetComponent<Rigidbody2D>();
         _animatorController = GetComponent<Animator>(); 
         _view = GetComponent<PhotonView>();
+
+        NickNameInput.text = _view.Owner.NickName;
     }
 
 
@@ -76,10 +74,13 @@ public class MovePlayer : MonoBehaviour
     {
         _isRightPlayer = !_isRightPlayer;
         var theScale = base.transform.localScale;
+        var textScale = NickNameInput.transform.localScale;
 
         theScale.x *= -1;
+        textScale.x *= -1;
 
         transform.localScale = theScale;
+        NickNameInput.transform.localScale = textScale;
     }
 
 

@@ -11,33 +11,41 @@ public class MenuManager : MonoBehaviourPunCallbacks
 {
     public TMP_InputField createInput;
     public TMP_InputField joinInput;
-    
+    public TMP_InputField NickNameInput;
+
     public TextMeshProUGUI LogText;
     void Start()
     {
-        
+        NickNameInput.text = PhotonNetwork.NickName;
     }
-
-    
 
     public void CreateRoom()
     {
-        RoomOptions roomOptions = new RoomOptions();
-        roomOptions.MaxPlayers = 10;
-        PhotonNetwork.CreateRoom(createInput.text, roomOptions);
+        if (!string.IsNullOrWhiteSpace(createInput.text))
+        {
+            RoomOptions roomOptions = new RoomOptions();
+            roomOptions.MaxPlayers = 10;
+            PhotonNetwork.CreateRoom(createInput.text, roomOptions);
+        }
     }
 
     public void JoinRoom()
     {
-        if (!string.IsNullOrEmpty(joinInput.text))
+        if (!string.IsNullOrWhiteSpace(joinInput.text))
             PhotonNetwork.JoinRoom(joinInput.text);
     }
 
     public override void OnJoinedRoom()
     {
-        Debug.Log("onjoin1");
         PhotonNetwork.LoadLevel(2);
-        Debug.Log("onjoin2");
+    }
+    public void SetNewNickName()
+    {
+        PhotonNetwork.NickName = NickNameInput.text;
+    }
+    public void ExitGame()
+    {
+        Application.Quit();
     }
 
     private void Log(string message)
