@@ -16,6 +16,9 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public TextMeshProUGUI LogText;
     void Start()
     {
+        if (PlayerPrefs.HasKey("NickName"))
+            PhotonNetwork.NickName = PlayerPrefs.GetString("NickName");
+
         NickNameInput.text = PhotonNetwork.NickName;
     }
 
@@ -41,7 +44,12 @@ public class MenuManager : MonoBehaviourPunCallbacks
     }
     public void SetNewNickName()
     {
-        PhotonNetwork.NickName = NickNameInput.text;
+        string newNickName = NickNameInput.text;
+        if (!string.IsNullOrWhiteSpace(newNickName))
+        {
+            PhotonNetwork.NickName = newNickName;
+            PlayerPrefs.SetString("NickName", NickNameInput.text);
+        }
     }
     public void ExitGame()
     {
