@@ -401,6 +401,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
+  - {fileID: 7136423246141579731}
   - {fileID: 3093690818578674440}
   - {fileID: 90966598270182282}
   sceneViewId: 0
@@ -420,7 +421,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_SynchronizePosition: 1
   m_SynchronizeRotation: 0
-  m_SynchronizeScale: 1
+  m_SynchronizeScale: 0
   m_UseLocal: 1
 --- !u!114 &90966598270182282
 MonoBehaviour:

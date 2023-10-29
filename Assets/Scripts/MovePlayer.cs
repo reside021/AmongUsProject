@@ -1,9 +1,11 @@
 using UnityEngine;
 using Photon.Pun;
 using TMPro;
+using ExitGames.Client.Photon;
+using System;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class MovePlayer : MonoBehaviour
+public class MovePlayer : MonoBehaviour, IPunObservable
 {
     public float MoveSpeed = 10f;
     public TextMeshProUGUI NickNameText;
@@ -11,16 +13,21 @@ public class MovePlayer : MonoBehaviour
     private MoveState _moveState = MoveState.Idle;
     private Rigidbody2D _rb;
     private Animator _animatorController;
-    private bool _isRightPlayer = true;
+    private SpriteRenderer _spriteRenderer;
+
+    private Vector2 _directionPlayer;
 
     private PhotonView _view;
 
 
     void Start()
     {
+        PhotonPeer.RegisterType(typeof(Vector2), 242, SerializeVector2Int, DeserializeVector2Int);
+
         _rb = GetComponent<Rigidbody2D>();
         _animatorController = GetComponent<Animator>(); 
         _view = GetComponent<PhotonView>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
 
         NickNameText.text = _view.Owner.NickName;
     }
@@ -34,35 +41,32 @@ public class MovePlayer : MonoBehaviour
     private void Walk()
     {
 
-        if (!_view.IsMine) return;
-
-        float moveHorizontal = Input.GetAxis("Horizontal");
-
-        float moveVertical = Input.GetAxis("Vertical");
-
-
-        if (moveHorizontal == 0 && moveVertical == 0)
+        if (_view.IsMine)
         {
-            Idle();
-            return;
+
+            float moveHorizontal = Input.GetAxis("Horizontal");
+
+            float moveVertical = Input.GetAxis("Vertical");
+
+            if (moveHorizontal == 0 && moveVertical == 0)
+            {
+                Idle();
+                return;
+            }
+
+            if (moveHorizontal > 0) _directionPlayer = Vector2.right;
+            if (moveHorizontal < 0) _directionPlayer = Vector2.left;
+            
+            var movement = new Vector2(moveHorizontal, moveVertical);
+
+            var move = movement * MoveSpeed * Time.deltaTime;
+
+            transform.Translate(move);
+            _animatorController.SetBool("Walk", true);
         }
 
-        if (moveHorizontal > 0 && !_isRightPlayer)
-        {
-            Flip();
-        }
-        else if (moveHorizontal < 0 && _isRightPlayer)
-        {
-            Flip();
-        }
-
-        Vector2 movement = new Vector2(moveHorizontal, moveVertical);
-
-        var move = movement * MoveSpeed * Time.deltaTime;
-
-        transform.Translate(move);
-        _animatorController.SetBool("Walk", true);
-
+        if (_directionPlayer == Vector2.right) _spriteRenderer.flipX = false;
+        if (_directionPlayer == Vector2.left) _spriteRenderer.flipX = true;     
     }
     public void Idle()
     {
@@ -70,23 +74,45 @@ public class MovePlayer : MonoBehaviour
         _animatorController.SetBool("Walk", false);
     }
 
-    private void Flip()
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        _isRightPlayer = !_isRightPlayer;
-        var theScale = base.transform.localScale;
-        var theNickName = NickNameText.transform.localScale;
-
-        theScale.x *= -1;
-        theNickName.x *= -1;
-
-        transform.localScale = theScale;
-        NickNameText.transform.localScale = theScale;
+        if (stream.IsWriting)
+        {
+            stream.SendNext(_directionPlayer);
+        }
+        else
+        {
+            _directionPlayer = (Vector2)stream.ReceiveNext();
+        }
     }
-
 
     enum MoveState
     {
         Idle,
         Walk
+    }
+
+
+    public static object DeserializeVector2Int(byte[] data)
+    {
+        Vector2 result = new Vector2();
+
+        result.x = BitConverter.ToInt32(data, 0);
+        result.y = BitConverter.ToInt32(data, 4);
+
+        return result;
+    }
+
+    public static byte[] SerializeVector2Int(object obj)
+    {
+        var vector = (Vector2)obj;
+
+        byte[] result = new byte[8];
+
+        BitConverter.GetBytes(vector.x).CopyTo(result, 0);
+        BitConverter.GetBytes(vector.y).CopyTo(result, 4);
+
+        return result;
     }
 }

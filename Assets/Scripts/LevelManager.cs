@@ -1,10 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using UnityEngine.SceneManagement;
 using Photon.Realtime;
 using Cinemachine;
+using System;
 
 public class LevelManager : MonoBehaviourPunCallbacks
 {
@@ -15,11 +14,7 @@ public class LevelManager : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.IsMasterClient)
             Spawn();
-    }
 
-    void Update()
-    {
-        
     }
 
     public void Leave()
@@ -35,10 +30,11 @@ public class LevelManager : MonoBehaviourPunCallbacks
 
     private void Spawn()
     {
-        var pos = new Vector2(Random.Range(-2, 2), Random.Range(-3, 3));
+        var pos = new Vector2(UnityEngine.Random.Range(-2, 2), UnityEngine.Random.Range(-3, 3));
         var gameObject = PhotonNetwork.Instantiate(PlayerPrefab.name, pos, Quaternion.identity);
         var virtualCamera = Cinemachine.GetComponent<CinemachineVirtualCamera>();
         virtualCamera.Follow = gameObject.transform;
+
     }
 
     public override void OnJoinedRoom()
@@ -56,4 +52,5 @@ public class LevelManager : MonoBehaviourPunCallbacks
     {
         Debug.LogFormat("Player {0} left room", otherPlayer.NickName);
     }
+
 }
