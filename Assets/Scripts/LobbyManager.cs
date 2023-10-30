@@ -3,6 +3,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -12,14 +13,40 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     public GameObject PlayerPrefab;
     public GameObject Cinemachine;
     public Button BackButton;
+    public Button StartGameBtn;
+    public Button ReadyBtn;
+
+    public TextMeshProUGUI ReadyPlayerText;
 
     void Start()
     {
-        BackButton.onClick.AddListener(Leave);
+        SetCountPlayerText();
+
+        AddListenersForButton();
 
         if (PhotonNetwork.IsMasterClient)
+        {
+            StartGameBtn.gameObject.SetActive(true);
             Spawn();
+        }
     }
+
+
+    private void SetCountPlayerText()
+    {
+        var allPlayerCount = PhotonNetwork.CurrentRoom.PlayerCount.ToString();
+        string readyPlayerCount = "0";
+        ReadyPlayerText.text = $"{readyPlayerCount}/{allPlayerCount}";
+    }
+
+    private void AddListenersForButton()
+    {
+        BackButton.onClick.AddListener(Leave);
+        StartGameBtn.onClick.AddListener(StartGame);
+        ReadyBtn.onClick.AddListener(ReadyForGame);
+    }
+
+
 
     private void Leave()
     {
@@ -46,8 +73,27 @@ public class LobbyManager : MonoBehaviourPunCallbacks
             Spawn();
     }
 
-    public void StartGame()
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        SetCountPlayerText();
+    }
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        if (PhotonNetwork.IsMasterClient)
+            StartGameBtn.gameObject.SetActive(true);
+
+
+        SetCountPlayerText();
+    }
+
+    private void StartGame()
     {
 
+    }
+
+    private void ReadyForGame()
+    {
+        
     }
 }

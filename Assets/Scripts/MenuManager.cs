@@ -6,6 +6,8 @@ using Photon.Realtime;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
+using System;
 
 public class MenuManager : MonoBehaviourPunCallbacks
 {

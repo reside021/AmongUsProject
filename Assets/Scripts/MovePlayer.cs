@@ -15,14 +15,16 @@ public class MovePlayer : MonoBehaviour, IPunObservable
     private Animator _animatorController;
     private SpriteRenderer _spriteRenderer;
 
-    private Vector2 _directionPlayer;
+    private bool _isRightPlayer;
+
+    //private Vector2 _directionPlayer;
 
     private PhotonView _view;
 
 
     void Start()
     {
-        PhotonPeer.RegisterType(typeof(Vector2), 242, SerializeVector2Int, DeserializeVector2Int);
+        //PhotonPeer.RegisterType(typeof(Vector2), 242, SerializeVector2Int, DeserializeVector2Int);
 
         _rb = GetComponent<Rigidbody2D>();
         _animatorController = GetComponent<Animator>(); 
@@ -40,7 +42,6 @@ public class MovePlayer : MonoBehaviour, IPunObservable
 
     private void Walk()
     {
-
         if (_view.IsMine)
         {
 
@@ -54,19 +55,21 @@ public class MovePlayer : MonoBehaviour, IPunObservable
                 return;
             }
 
-            if (moveHorizontal > 0) _directionPlayer = Vector2.right;
-            if (moveHorizontal < 0) _directionPlayer = Vector2.left;
+            if (moveHorizontal > 0) _isRightPlayer = true;
+            if (moveHorizontal < 0) _isRightPlayer = false;
             
             var movement = new Vector2(moveHorizontal, moveVertical);
 
-            var move = movement * MoveSpeed * Time.deltaTime;
+            var move = MoveSpeed * Time.deltaTime * movement;
 
             transform.Translate(move);
             _animatorController.SetBool("Walk", true);
         }
 
-        if (_directionPlayer == Vector2.right) _spriteRenderer.flipX = false;
-        if (_directionPlayer == Vector2.left) _spriteRenderer.flipX = true;     
+        if (_isRightPlayer) 
+            _spriteRenderer.flipX = false;
+        else
+            _spriteRenderer.flipX = true;
     }
     public void Idle()
     {
@@ -79,11 +82,11 @@ public class MovePlayer : MonoBehaviour, IPunObservable
     {
         if (stream.IsWriting)
         {
-            stream.SendNext(_directionPlayer);
+            stream.SendNext(_isRightPlayer);
         }
         else
         {
-            _directionPlayer = (Vector2)stream.ReceiveNext();
+            _isRightPlayer = (bool)stream.ReceiveNext();
         }
     }
 
@@ -94,25 +97,25 @@ public class MovePlayer : MonoBehaviour, IPunObservable
     }
 
 
-    public static object DeserializeVector2Int(byte[] data)
-    {
-        Vector2 result = new Vector2();
+    //public static object DeserializeVector2Int(byte[] data)
+    //{
+    //    Vector2 result = new Vector2();
 
-        result.x = BitConverter.ToInt32(data, 0);
-        result.y = BitConverter.ToInt32(data, 4);
+    //    result.x = BitConverter.ToInt32(data, 0);
+    //    result.y = BitConverter.ToInt32(data, 4);
 
-        return result;
-    }
+    //    return result;
+    //}
 
-    public static byte[] SerializeVector2Int(object obj)
-    {
-        var vector = (Vector2)obj;
+    //public static byte[] SerializeVector2Int(object obj)
+    //{
+    //    var vector = (Vector2)obj;
 
-        byte[] result = new byte[8];
+    //    byte[] result = new byte[8];
 
-        BitConverter.GetBytes(vector.x).CopyTo(result, 0);
-        BitConverter.GetBytes(vector.y).CopyTo(result, 4);
+    //    BitConverter.GetBytes(vector.x).CopyTo(result, 0);
+    //    BitConverter.GetBytes(vector.y).CopyTo(result, 4);
 
-        return result;
-    }
+    //    return result;
+    //}
 }
