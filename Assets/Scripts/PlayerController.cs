@@ -1,11 +1,10 @@
-using UnityEngine;
 using Photon.Pun;
+using System.Collections;
+using System.Collections.Generic;
 using TMPro;
-using ExitGames.Client.Photon;
-using System;
+using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody2D))]
-public class MovePlayer : MonoBehaviour, IPunObservable
+public class PlayerController : MonoBehaviour, IPunObservable
 {
     public float MoveSpeed = 10f;
     public TextMeshProUGUI NickNameText;
@@ -27,7 +26,7 @@ public class MovePlayer : MonoBehaviour, IPunObservable
         //PhotonPeer.RegisterType(typeof(Vector2), 242, SerializeVector2Int, DeserializeVector2Int);
 
         _rb = GetComponent<Rigidbody2D>();
-        _animatorController = GetComponent<Animator>(); 
+        _animatorController = GetComponent<Animator>();
         _view = GetComponent<PhotonView>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
 
@@ -57,7 +56,7 @@ public class MovePlayer : MonoBehaviour, IPunObservable
 
             if (moveHorizontal > 0) _isRightPlayer = true;
             if (moveHorizontal < 0) _isRightPlayer = false;
-            
+
             var movement = new Vector2(moveHorizontal, moveVertical);
 
             var move = MoveSpeed * Time.deltaTime * movement;
@@ -66,7 +65,7 @@ public class MovePlayer : MonoBehaviour, IPunObservable
             _animatorController.SetBool("Walk", true);
         }
 
-        if (_isRightPlayer) 
+        if (_isRightPlayer)
             _spriteRenderer.flipX = false;
         else
             _spriteRenderer.flipX = true;

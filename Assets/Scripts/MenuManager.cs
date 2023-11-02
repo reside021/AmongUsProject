@@ -5,9 +5,6 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.SceneManagement;
-using UnityEngine.EventSystems;
-using System;
 
 public class MenuManager : MonoBehaviourPunCallbacks
 {
@@ -16,13 +13,29 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public TMP_InputField NickNameInput;
 
     public TextMeshProUGUI LogText;
+
+    public Button CreateRoomBtn;
+    public Button JoinRoomBtn;
+    public Button SaveNickNameBtn;
+    public Button ExitGameBtn;
     void Start()
     {
+        AddListenersForButton();
+
         if (PlayerPrefs.HasKey("NickName"))
             PhotonNetwork.NickName = PlayerPrefs.GetString("NickName");
 
         NickNameInput.text = PhotonNetwork.NickName;
     }
+
+    private void AddListenersForButton()
+    {
+        CreateRoomBtn.onClick.AddListener(CreateRoom);
+        JoinRoomBtn.onClick.AddListener(JoinRoom);
+        SaveNickNameBtn.onClick.AddListener(SetNewNickName);
+        ExitGameBtn.onClick.AddListener(ExitGame);
+    }
+
 
     public void CreateRoom()
     {
@@ -32,6 +45,11 @@ public class MenuManager : MonoBehaviourPunCallbacks
             roomOptions.MaxPlayers = 10;
             PhotonNetwork.CreateRoom(createInput.text, roomOptions);
         }
+    }
+
+    public override void OnCreateRoomFailed(short returnCode, string message)
+    {
+        LogText.text = message;
     }
 
     public void JoinRoom()
@@ -44,6 +62,12 @@ public class MenuManager : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.LoadLevel(2);
     }
+
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        LogText.text = message;
+    }
+
     public void SetNewNickName()
     {
         string newNickName = NickNameInput.text;

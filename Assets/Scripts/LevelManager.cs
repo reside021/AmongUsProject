@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using Photon.Realtime;
 using Cinemachine;
 using System;
+using System.Collections;
 
 public class LevelManager : MonoBehaviourPunCallbacks
 {
@@ -12,16 +13,13 @@ public class LevelManager : MonoBehaviourPunCallbacks
 
     void Start()
     {
-        if (PhotonNetwork.IsMasterClient)
-            Spawn();
-
+        Spawn();
     }
 
     public void Leave()
     {
         PhotonNetwork.LeaveRoom();
     }
-
     public override void OnLeftRoom()
     {
         // current player left room
@@ -37,11 +35,6 @@ public class LevelManager : MonoBehaviourPunCallbacks
 
     }
 
-    public override void OnJoinedRoom()
-    {
-        if (!PhotonNetwork.IsMasterClient)
-            Spawn();
-    }
 
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {

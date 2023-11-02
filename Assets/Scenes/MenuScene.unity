@@ -394,19 +394,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 332002903}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2047258301}
-        m_TargetAssemblyTypeName: MenuManager, Assembly-CSharp
-        m_MethodName: CreateRoom
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &332002903
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -457,7 +445,7 @@ GameObject:
   - component: {fileID: 455486028}
   - component: {fileID: 455486027}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: LogText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -471,18 +459,18 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 455486025}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1794176653}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -457.32, y: 2}
-  m_SizeDelta: {x: 449.35, y: 735.99}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 10, y: -10}
+  m_SizeDelta: {x: 1283, y: 60}
+  m_Pivot: {x: 0, y: 1}
 --- !u!114 &455486027
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1168,19 +1156,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 594194666}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2047258301}
-        m_TargetAssemblyTypeName: MenuManager, Assembly-CSharp
-        m_MethodName: SetNewNickName
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &594194666
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1544,7 +1520,7 @@ RectTransform:
   - {fileID: 1369033012}
   - {fileID: 671548849}
   m_Father: {fileID: 1794176653}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -2078,7 +2054,7 @@ RectTransform:
   m_Children:
   - {fileID: 1982447468}
   m_Father: {fileID: 1794176653}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
@@ -2128,19 +2104,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 978082628}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2047258301}
-        m_TargetAssemblyTypeName: MenuManager, Assembly-CSharp
-        m_MethodName: ExitGame
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &978082628
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2648,7 +2612,6 @@ GameObject:
   - component: {fileID: 1369033015}
   - component: {fileID: 1369033014}
   - component: {fileID: 1369033013}
-  - component: {fileID: 1369033016}
   m_Layer: 5
   m_Name: JoinBtn
   m_TagString: Untagged
@@ -2720,19 +2683,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1369033014}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2047258301}
-        m_TargetAssemblyTypeName: MenuManager, Assembly-CSharp
-        m_MethodName: JoinRoom
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1369033014
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2771,35 +2722,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1369033011}
   m_CullTransparentMesh: 1
---- !u!114 &1369033016
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1369033011}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Delegates:
-  - eventID: 15
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 0}
-          m_TargetAssemblyTypeName: 
-          m_MethodName: 
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: 
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
 --- !u!1 &1616602222
 GameObject:
   m_ObjectHideFlags: 0
@@ -2831,7 +2753,7 @@ RectTransform:
   - {fileID: 332002901}
   - {fileID: 818223403}
   m_Father: {fileID: 1794176653}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -2869,10 +2791,10 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 455486026}
   - {fileID: 978082626}
   - {fileID: 690039468}
   - {fileID: 1616602223}
-  - {fileID: 455486026}
   - {fileID: 472257588}
   m_Father: {fileID: 0}
   m_RootOrder: 5
@@ -3248,6 +3170,10 @@ MonoBehaviour:
   joinInput: {fileID: 671548850}
   NickNameInput: {fileID: 557638754}
   LogText: {fileID: 455486027}
+  CreateRoomBtn: {fileID: 332002902}
+  JoinRoomBtn: {fileID: 1369033013}
+  SaveNickNameBtn: {fileID: 594194665}
+  ExitGameBtn: {fileID: 978082627}
 --- !u!4 &2047258302
 Transform:
   m_ObjectHideFlags: 0
