@@ -45,7 +45,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
         ReadyPlayerText.text = $"{readyPlayerCount}/{allPlayerCount}";
 
-        if (allPlayerCount < 2 || readyPlayerCount < allPlayerCount)
+        //if (allPlayerCount < 2 || readyPlayerCount < allPlayerCount)
+        if (readyPlayerCount < allPlayerCount)
         {
             StartGameBtn.interactable = false;
         }

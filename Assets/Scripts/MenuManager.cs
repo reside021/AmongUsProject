@@ -20,6 +20,8 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public Button ExitGameBtn;
     void Start()
     {
+        PhotonNetwork.AutomaticallySyncScene = true;
+
         AddListenersForButton();
 
         if (PlayerPrefs.HasKey("NickName"))

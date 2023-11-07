@@ -8,6 +8,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
 {
     public float MoveSpeed = 10f;
     public TextMeshProUGUI NickNameText;
+    public Sprite Player;
+    public Sprite Ghost;
 
     private MoveState _moveState = MoveState.Idle;
     private Rigidbody2D _rb;
@@ -19,6 +21,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     //private Vector2 _directionPlayer;
 
     private PhotonView _view;
+    private bool _isDead = false;
 
 
     void Start()
@@ -31,6 +34,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         _spriteRenderer = GetComponent<SpriteRenderer>();
 
         NickNameText.text = _view.Owner.NickName;
+        _isDead = true;
     }
 
 
@@ -50,7 +54,13 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
             if (moveHorizontal == 0 && moveVertical == 0)
             {
-                Idle();
+                if (_isDead)
+                {
+                    _animatorController.SetBool("Ghosting", true);
+                } else
+                {
+                    _animatorController.SetBool("Walk", false);
+                }
                 return;
             }
 
@@ -62,37 +72,70 @@ public class PlayerController : MonoBehaviour, IPunObservable
             var move = MoveSpeed * Time.deltaTime * movement;
 
             transform.Translate(move);
-            _animatorController.SetBool("Walk", true);
+            if (_isDead)
+            {
+                _animatorController.SetBool("Ghosting", true);
+            } else
+            {
+                _animatorController.SetBool("Walk", true);
+            }
+
         }
 
         if (_isRightPlayer)
             _spriteRenderer.flipX = false;
         else
             _spriteRenderer.flipX = true;
-    }
-    public void Idle()
-    {
-        _moveState = MoveState.Idle;
-        _animatorController.SetBool("Walk", false);
+
     }
 
+    private void SetAnimation()
+    {
+        switch (_moveState)
+            {
+                case MoveState.Idle:
+                    _animatorController.SetBool("Walk", false);
+                    Debug.Log("IDLE");
+                break;
+                case MoveState.Ghosting:
+                    _animatorController.SetBool("Ghosting", true);
+                    break;
+                case MoveState.Walk:
+                    _animatorController.SetBool("Walk", true);
+                    Debug.Log("WALK");
+                    break;
+            }
+    }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
         if (stream.IsWriting)
         {
             stream.SendNext(_isRightPlayer);
+            stream.SendNext(_isDead);
         }
         else
         {
             _isRightPlayer = (bool)stream.ReceiveNext();
+            _isDead= (bool)stream.ReceiveNext();
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        Debug.Log("TRIGGER");
+        if (other.gameObject.tag.Equals("Player"))
+        {
+            Debug.Log("STAYTRIGGER");
+            other.gameObject.GetComponent<SpriteRenderer>().color= Color.red;
         }
     }
 
     enum MoveState
     {
         Idle,
-        Walk
+        Walk,
+        Ghosting
     }
 
 
