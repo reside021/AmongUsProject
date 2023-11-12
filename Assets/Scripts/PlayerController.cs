@@ -8,8 +8,14 @@ public class PlayerController : MonoBehaviour, IPunObservable
 {
     public float MoveSpeed = 10f;
     public TextMeshProUGUI NickNameText;
-    public Sprite Player;
-    public Sprite Ghost;
+
+    public Material PlayerMat;
+    public Material OutlinePlayerMat;
+    public Material GhostMat;
+
+    public Sprite PlayerSprite;
+    public Sprite GhostSprite;
+
 
     private MoveState _moveState = MoveState.Idle;
     private Rigidbody2D _rb;
@@ -18,10 +24,11 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
     private bool _isRightPlayer;
 
-    //private Vector2 _directionPlayer;
 
     private PhotonView _view;
     private bool _isDead = false;
+    private bool _isImposter = false;
+    private GameObject _targetForKill = null;
 
 
     void Start()
@@ -34,7 +41,12 @@ public class PlayerController : MonoBehaviour, IPunObservable
         _spriteRenderer = GetComponent<SpriteRenderer>();
 
         NickNameText.text = _view.Owner.NickName;
-        _isDead = true;
+        //_isDead = true;
+        if (PhotonNetwork.IsMasterClient)
+        {
+            _isImposter = true;
+        }
+
     }
 
 
@@ -117,17 +129,68 @@ public class PlayerController : MonoBehaviour, IPunObservable
         else
         {
             _isRightPlayer = (bool)stream.ReceiveNext();
-            _isDead= (bool)stream.ReceiveNext();
+            _isDead = (bool)stream.ReceiveNext();
+        }
+    }
+
+
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        //if (!_isImposter) return;
+
+        //if (other.GetComponent<PhotonView>().IsMine) return;
+
+        //if (other.gameObject.CompareTag("Player"))
+        //{
+        //    if (IsFirstEnter(other.gameObject)) return;
+
+        //    var distForCurrentTarget = Vector3.Distance(_targetForKill.transform.position, transform.position);
+        //    var distForOtherTarget = Vector3.Distance(other.transform.position, transform.position);
+
+        //    if (distForOtherTarget < distForCurrentTarget)
+        //    {
+        //        _targetForKill = other.gameObject;
+        //    }
+        //    _targetForKill.GetComponent<SpriteRenderer>().material = OutlinePlayerMat;
+        //}
+    }
+
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (!_isImposter) return;
+
+        if (other.GetComponent<PhotonView>().IsMine) return;
+
+        if (other.gameObject.CompareTag("Player"))
+        {
+            other.gameObject.GetComponent<SpriteRenderer>().material = PlayerMat;
         }
     }
 
     private void OnTriggerStay2D(Collider2D other)
     {
-        Debug.Log("TRIGGER");
-        if (other.gameObject.tag.Equals("Player"))
+        if (!_isImposter) return;
+
+        if (other.GetComponent<PhotonView>().IsMine) return;
+
+        if (other.gameObject.CompareTag("Player"))
         {
-            Debug.Log("STAYTRIGGER");
-            other.gameObject.GetComponent<SpriteRenderer>().color= Color.red;
+            if (_targetForKill == null)
+            {
+                _targetForKill = other.gameObject;
+            }
+
+            var distForCurrentTarget = Vector3.Distance(_targetForKill.transform.position, transform.position);
+            var distForOtherTarget = Vector3.Distance(other.transform.position, transform.position);
+
+            if (distForOtherTarget < distForCurrentTarget)
+            {
+                _targetForKill.GetComponent<SpriteRenderer>().material = PlayerMat;
+                _targetForKill = other.gameObject;
+            }
+            _targetForKill.GetComponent<SpriteRenderer>().material = OutlinePlayerMat;
         }
     }
 
