@@ -5,6 +5,7 @@ using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -78,6 +79,17 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     private void StartGame()
     {
+        var hT = new ExitGames.Client.Photon.Hashtable();
+        if (PhotonNetwork.IsMasterClient)
+        {
+            hT["isImposter"] = true;
+        }
+        else
+        {
+            hT["isImposter"] = false;
+        }
+        Debug.Log(hT);
+        PhotonNetwork.LocalPlayer.CustomProperties = hT;
         PhotonNetwork.DestroyAll();
         PhotonNetwork.CurrentRoom.IsOpen = false;
         PhotonNetwork.LoadLevel(3);

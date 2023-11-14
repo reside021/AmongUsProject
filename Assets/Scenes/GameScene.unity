@@ -155,7 +155,6 @@ MonoBehaviour:
   PlayerPrefab: {fileID: 7136423246141579728, guid: 9df04a77a45789945ac69f3cdfe08fea, type: 3}
   Cinemachine: {fileID: 1342263440}
   BackButton: {fileID: 836118572}
-  KillButton: {fileID: 996364849}
 --- !u!4 &237056287
 Transform:
   m_ObjectHideFlags: 0

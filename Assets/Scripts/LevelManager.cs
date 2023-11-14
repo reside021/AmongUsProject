@@ -13,7 +13,7 @@ public class LevelManager : MonoBehaviourPunCallbacks
     public GameObject PlayerPrefab;
     public GameObject Cinemachine;
     public Button BackButton;
-    public Button KillButton;
+    public static Button KillButton;
 
     void Start()
     {
@@ -21,13 +21,13 @@ public class LevelManager : MonoBehaviourPunCallbacks
 
         var pos = new Vector2(UnityEngine.Random.Range(-2, 2), UnityEngine.Random.Range(-3, 3));
         var gameObject = PhotonNetwork.Instantiate(PlayerPrefab.name, pos, Quaternion.identity);
+
         var virtualCamera = Cinemachine.GetComponent<CinemachineVirtualCamera>();
         virtualCamera.Follow = gameObject.transform;
     }
     private void AddListenersForButton()
     {
         BackButton.onClick.AddListener(Leave);
-        KillButton.onClick.AddListener(KillPlayer);
     }
 
     private void Update()
@@ -37,11 +37,6 @@ public class LevelManager : MonoBehaviourPunCallbacks
         //{
         //    Debug.Log(p.transform.position);
         //}
-    }
-
-    private void KillPlayer()
-    {
-
     }
 
     public void Leave()
