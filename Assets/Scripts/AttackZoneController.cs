@@ -1,6 +1,9 @@
+using ExitGames.Client.Photon;
 using Photon.Pun;
+using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.Dependencies.NCalc;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -11,34 +14,15 @@ public class AttackZoneController : MonoBehaviour
     public Material OutlinePlayerMat;
     public SpriteRenderer SpriteRenderer;
 
-
-    private bool _isImposter = false;
-    private GameObject _targetForKill = null;
-    private Button _killBtn;
-
+    private GameObject _targetForKill;
+    private bool _isImposter;
 
     private void Start()
     {
-        if (SceneManager.GetActiveScene().name != "GameScene") return;
-
-        _isImposter = (bool)PhotonNetwork.LocalPlayer.CustomProperties["isImposter"];
-
-        _killBtn = GameObject.Find("/Canvas/KillBtn").GetComponent<Button>();
-
-        if (!_isImposter)
-        {
-            _killBtn.gameObject.SetActive(false);
-        } else
-        {
-            _killBtn.onClick.AddListener(KillPlayer);
-        }
-        _killBtn.interactable = false;
+        if (PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("isImposter"))
+            _isImposter = (bool)PhotonNetwork.LocalPlayer.CustomProperties["isImposter"];
     }
 
-    private void KillPlayer()
-    {
-        Debug.Log("KIIIL");
-    }
 
     private void OnTriggerExit2D(Collider2D other)
     {
@@ -51,7 +35,6 @@ public class AttackZoneController : MonoBehaviour
         if (other.gameObject.CompareTag("Player"))
         {
             other.gameObject.GetComponent<SpriteRenderer>().material = PlayerMat;
-            _killBtn.interactable = false;
         }
     }
 
@@ -79,7 +62,6 @@ public class AttackZoneController : MonoBehaviour
                 _targetForKill = other.gameObject;
             }
             _targetForKill.GetComponent<SpriteRenderer>().material = OutlinePlayerMat;
-            _killBtn.interactable = true;
         }
     }
 }

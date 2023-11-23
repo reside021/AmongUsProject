@@ -53,6 +53,26 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
         else
         {
+
+            foreach (var player in PhotonNetwork.PlayerList)
+            {
+                var isImposter = false;
+
+                if (player.IsMasterClient)
+                {
+                    isImposter = true;
+                }
+                else
+                {
+                    isImposter = false;
+                }
+
+                var options = new RaiseEventOptions { TargetActors = new int[] { player.ActorNumber } };
+                var sendOptions = new SendOptions { Reliability = true };
+                PhotonNetwork.RaiseEvent(43, isImposter, options, sendOptions);
+
+            }
+
             StartGameBtn.interactable = true;
         }
     }
@@ -79,17 +99,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     private void StartGame()
     {
-        var hT = new ExitGames.Client.Photon.Hashtable();
-        if (PhotonNetwork.IsMasterClient)
-        {
-            hT["isImposter"] = true;
-        }
-        else
-        {
-            hT["isImposter"] = false;
-        }
-        Debug.Log(hT);
-        PhotonNetwork.LocalPlayer.CustomProperties = hT;
         PhotonNetwork.DestroyAll();
         PhotonNetwork.CurrentRoom.IsOpen = false;
         PhotonNetwork.LoadLevel(3);
@@ -153,6 +162,13 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
             var newReadyStatePlayer = photonEvent.CustomData as Dictionary<string, bool>;
             _readyStatePlayer = newReadyStatePlayer;
             SetCountPlayerText();
+        }
+        if (photonEvent.Code == 43)
+        {
+            Debug.Log($"Получена рассылка ролей: {photonEvent.CustomData}");
+            var hT = new ExitGames.Client.Photon.Hashtable();
+            hT["isImposter"] = (bool)photonEvent.CustomData;
+            PhotonNetwork.LocalPlayer.CustomProperties = hT;
         }
     }
 

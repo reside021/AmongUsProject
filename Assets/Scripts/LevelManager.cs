@@ -7,24 +7,30 @@ using System;
 using System.Collections;
 using UnityEngine.UI;
 using System.Linq;
+using ExitGames.Client.Photon;
 
-public class LevelManager : MonoBehaviourPunCallbacks
+public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
 {
     public GameObject PlayerPrefab;
     public GameObject Cinemachine;
     public Button BackButton;
-    public static Button KillButton;
+    public Button KillButton;
+
+    private GameObject _player;
+
 
     void Start()
     {
         AddListenersForButton();
 
         var pos = new Vector2(UnityEngine.Random.Range(-2, 2), UnityEngine.Random.Range(-3, 3));
-        var gameObject = PhotonNetwork.Instantiate(PlayerPrefab.name, pos, Quaternion.identity);
+        _player = PhotonNetwork.Instantiate(PlayerPrefab.name, pos, Quaternion.identity);
 
         var virtualCamera = Cinemachine.GetComponent<CinemachineVirtualCamera>();
         virtualCamera.Follow = gameObject.transform;
+
     }
+
     private void AddListenersForButton()
     {
         BackButton.onClick.AddListener(Leave);
@@ -32,11 +38,7 @@ public class LevelManager : MonoBehaviourPunCallbacks
 
     private void Update()
     {
-        //GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-        //foreach (GameObject p in players)
-        //{
-        //    Debug.Log(p.transform.position);
-        //}
+
     }
 
     public void Leave()
@@ -60,4 +62,16 @@ public class LevelManager : MonoBehaviourPunCallbacks
         Debug.LogFormat("Player {0} left room", otherPlayer.NickName);
     }
 
+    public void OnEvent(EventData photonEvent)
+    {
+        if (photonEvent.Code == 99)
+        {
+            var isDead = (bool)photonEvent.CustomData;
+
+            if (isDead)
+            {
+                _player.GetComponent<PlayerController>().IsDead = true;
+            }
+        }
+    }
 }
