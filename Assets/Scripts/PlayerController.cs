@@ -3,6 +3,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -11,6 +12,21 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour, IPunObservable
 {
+
+    private MoveState _moveState = MoveState.Idle;
+    private Rigidbody2D _rb;
+    private Animator _animatorController;
+    private SpriteRenderer _spriteRenderer;
+    private GameObject _targetForKill;
+    private Button _killBtn;
+    private PhotonView _view;
+    private bool _isImposter = false;
+    private bool _isRightPlayer = true;
+    private bool _isDead = false;
+    private bool _animOfDeath = false;
+    private Camera _camera;
+    private LayerMask _ghostPlayerLayer;
+
     public float MoveSpeed = 10f;
 
     public TextMeshProUGUI NickNameText;
@@ -23,23 +39,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
     public Sprite GhostSprite;
 
     public GameObject DeadBodyPrefab;
-
-    private MoveState _moveState = MoveState.Idle;
-    private Rigidbody2D _rb;
-    private Animator _animatorController;
-    private SpriteRenderer _spriteRenderer;
-
-    private GameObject _targetForKill;
-
-    private Button _killBtn;
-
-    private PhotonView _view;
-
-    private bool _isImposter = false;
-    private bool _isRightPlayer = true;
-    private bool _isDead = false;
-    private bool _animOfDeath = false;
-
 
     public bool IsDead
     {
@@ -55,15 +54,29 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
     }
 
+    public Button KillButton
+    {
+        get { return _killBtn; }
+        set { _killBtn = value; }
+
+    }
+
+    public Camera Camera 
+    {
+        get { return _camera; }
+        set { _camera = value; }
+    }
 
     void Start()
     {
+
         //PhotonPeer.RegisterType(typeof(Vector2), 242, SerializeVector2Int, DeserializeVector2Int);
 
         _rb = GetComponent<Rigidbody2D>();
         _animatorController = GetComponent<Animator>();
         _view = GetComponent<PhotonView>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
+        _ghostPlayerLayer = LayerMask.NameToLayer("GhostPlayer");
 
         NickNameText.text = _view.Owner.NickName;
 
@@ -71,7 +84,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
         if (!_view.IsMine) return;
 
-        _killBtn = GameObject.Find("/Canvas/KillBtn").GetComponent<Button>();
         _killBtn.onClick.AddListener(Kill);
 
         if (_view.Controller.CustomProperties.ContainsKey("isImposter"))
@@ -82,6 +94,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         if (_isImposter)
         {
             _killBtn.interactable = false;
+            _camera.cullingMask &= ~(1 << _ghostPlayerLayer);
         }
         else
         {
@@ -162,6 +175,9 @@ public class PlayerController : MonoBehaviour, IPunObservable
     {
         _animOfDeath = true;
         _animatorController.SetBool("Dead", true);
+
+        transform.GetChild(0).gameObject.layer = _ghostPlayerLayer;
+
         var lengthAnim = _animatorController.GetCurrentAnimatorClipInfo(0)[0].clip.length;
         StartCoroutine(WaitAnimCoroutine(lengthAnim));
 
@@ -169,7 +185,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
     IEnumerator WaitAnimCoroutine(float time)
     {
         yield return new WaitForSeconds(time);
+
+        gameObject.layer = _ghostPlayerLayer;
         PhotonNetwork.Instantiate(DeadBodyPrefab.name, transform.position, Quaternion.identity);
+
         _animOfDeath = false;
     }
 
