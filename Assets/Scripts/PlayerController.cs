@@ -94,7 +94,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         if (_isImposter)
         {
             _killBtn.interactable = false;
-            _camera.cullingMask &= ~(1 << _ghostPlayerLayer);
+            _camera.cullingMask &= ~(1 << _ghostPlayerLayer); // поменять 
         }
         else
         {
@@ -109,11 +109,12 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
         if (_targetForKill == null) return;
 
-        var actor = _targetForKill.GetComponent<PhotonView>().OwnerActorNr;
+        var targetActor = _targetForKill.GetComponent<PhotonView>().OwnerActorNr;
+        var killerID = GetComponent<PhotonView>().ViewID;
 
-        var options = new RaiseEventOptions { TargetActors = new int[] { actor } };
+        var options = new RaiseEventOptions { TargetActors = new int[] { targetActor } };
         var sendOptions = new SendOptions { Reliability = true };
-        PhotonNetwork.RaiseEvent(99, true, options, sendOptions);
+        PhotonNetwork.RaiseEvent(99, killerID, options, sendOptions);
 
         _targetForKill.GetComponent<SpriteRenderer>().material = PlayerMat;
     }
@@ -174,6 +175,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     private void Death()
     {
         _animOfDeath = true;
+
         _animatorController.SetBool("Dead", true);
 
         transform.GetChild(0).gameObject.layer = _ghostPlayerLayer;
@@ -182,6 +184,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
         StartCoroutine(WaitAnimCoroutine(lengthAnim));
 
     }
+
+
     IEnumerator WaitAnimCoroutine(float time)
     {
         yield return new WaitForSeconds(time);

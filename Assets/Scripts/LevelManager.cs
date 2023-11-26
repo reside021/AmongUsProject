@@ -8,6 +8,7 @@ using System.Collections;
 using UnityEngine.UI;
 using System.Linq;
 using ExitGames.Client.Photon;
+using System.Collections.Generic;
 
 public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
 {
@@ -16,6 +17,9 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public Button BackButton;
     public Button KillButton;
     public Camera Camera;
+    public GameObject DeathPanel;
+    public Transform ContainerForPlayer;
+
 
     private GameObject _player;
 
@@ -31,7 +35,7 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         _player.GetComponent<PlayerController>().Camera = Camera;
 
         var virtualCamera = Cinemachine.GetComponent<CinemachineVirtualCamera>();
-        virtualCamera.Follow = gameObject.transform;
+        virtualCamera.Follow = _player.transform;
 
     }
 
@@ -70,12 +74,26 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         if (photonEvent.Code == 99)
         {
-            var isDead = (bool)photonEvent.CustomData;
 
-            if (isDead)
-            {
-                _player.GetComponent<PlayerController>().IsDead = true;
-            }
+            var killerActor = (int)photonEvent.CustomData;
+
+            DisplayDeathScreen(killerActor);
+            _player.GetComponent<PlayerController>().IsDead = true;
         }
+    }
+
+
+    private void DisplayDeathScreen(int killerID)
+    {
+        DeathPanel.gameObject.SetActive(true);
+        Camera.gameObject.SetActive(false);
+        var objects = GameObject.FindGameObjectsWithTag("Player");
+
+        var gameObject = objects.First(x => x.GetComponent<PhotonView>().ViewID == killerID);
+
+        var victim = Instantiate(_player, ContainerForPlayer);
+        Destroy(victim.GetComponent<PlayerController>());
+        var killer = Instantiate(gameObject, ContainerForPlayer);
+        Destroy(killer.GetComponent<PlayerController>());
     }
 }

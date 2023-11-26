@@ -92,9 +92,9 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
     private void Spawn()
     {
         var pos = new Vector2(Random.Range(-2, 2), Random.Range(-3, 3));
-        var gameObject = PhotonNetwork.Instantiate(PlayerPrefab.name, pos, Quaternion.identity);
+        var player = PhotonNetwork.Instantiate(PlayerPrefab.name, pos, Quaternion.identity);
         var virtualCamera = Cinemachine.GetComponent<CinemachineVirtualCamera>();
-        virtualCamera.Follow = gameObject.transform;
+        virtualCamera.Follow = player.transform;
     }
 
     private void StartGame()
