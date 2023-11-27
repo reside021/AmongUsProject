@@ -17,8 +17,8 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public Button BackButton;
     public Button KillButton;
     public Camera Camera;
-    public GameObject DeathPanel;
-    public Transform ContainerForPlayer;
+    public Transform DeathPanel;
+    public GameObject PlayerDeathScreen;
 
 
     private GameObject _player;
@@ -91,9 +91,11 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
         var gameObject = objects.First(x => x.GetComponent<PhotonView>().ViewID == killerID);
 
-        var victim = Instantiate(_player, ContainerForPlayer);
-        Destroy(victim.GetComponent<PlayerController>());
-        var killer = Instantiate(gameObject, ContainerForPlayer);
-        Destroy(killer.GetComponent<PlayerController>());
+        var victim = Instantiate(PlayerDeathScreen, DeathPanel);
+        victim.transform.localPosition = new Vector3(-200.0f, 0.0f, 0.0f);
+        var killer = Instantiate(PlayerDeathScreen, DeathPanel);
+        killer.transform.localPosition = new Vector3(200.0f, 0.0f, 0.0f);
+        victim.GetComponent<Animator>().SetBool("IsKilled", true);
+        killer.GetComponent<Animator>().SetBool("IsKill", true);
     }
 }
