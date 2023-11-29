@@ -158,7 +158,7 @@ MonoBehaviour:
   KillButton: {fileID: 996364849}
   Camera: {fileID: 893289340}
   DeathPanel: {fileID: 1498334834}
-  PlayerDeathScreen: {fileID: 5961996307036729743, guid: 2b1b84d06d266a148836d5e5648a9c4c, type: 3}
+  KillScene: {fileID: 8044299206191682112, guid: 00f11f9227d638346a9807c6193cfe51, type: 3}
 --- !u!4 &237056287
 Transform:
   m_ObjectHideFlags: 0

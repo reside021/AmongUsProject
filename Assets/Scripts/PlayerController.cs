@@ -181,16 +181,17 @@ public class PlayerController : MonoBehaviour, IPunObservable
         transform.GetChild(0).gameObject.layer = _ghostPlayerLayer;
 
         var lengthAnim = _animatorController.GetCurrentAnimatorClipInfo(0)[0].clip.length;
-        StartCoroutine(WaitAnimCoroutine(lengthAnim));
+        StartCoroutine(CreateDeadBodyCoroutine(lengthAnim));
 
     }
 
 
-    IEnumerator WaitAnimCoroutine(float time)
+    IEnumerator CreateDeadBodyCoroutine(float time)
     {
         yield return new WaitForSeconds(time);
 
         gameObject.layer = _ghostPlayerLayer;
+
         PhotonNetwork.Instantiate(DeadBodyPrefab.name, transform.position, Quaternion.identity);
 
         _animOfDeath = false;

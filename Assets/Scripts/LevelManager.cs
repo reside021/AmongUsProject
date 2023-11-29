@@ -18,7 +18,7 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public Button KillButton;
     public Camera Camera;
     public Transform DeathPanel;
-    public GameObject PlayerDeathScreen;
+    public GameObject KillScene;
 
 
     private GameObject _player;
@@ -86,16 +86,23 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     private void DisplayDeathScreen(int killerID)
     {
         DeathPanel.gameObject.SetActive(true);
-        Camera.gameObject.SetActive(false);
+
         var objects = GameObject.FindGameObjectsWithTag("Player");
 
         var gameObject = objects.First(x => x.GetComponent<PhotonView>().ViewID == killerID);
 
-        var victim = Instantiate(PlayerDeathScreen, DeathPanel);
-        victim.transform.localPosition = new Vector3(-200.0f, 0.0f, 0.0f);
-        var killer = Instantiate(PlayerDeathScreen, DeathPanel);
-        killer.transform.localPosition = new Vector3(200.0f, 0.0f, 0.0f);
-        victim.GetComponent<Animator>().SetBool("IsKilled", true);
-        killer.GetComponent<Animator>().SetBool("IsKill", true);
+        StartCoroutine(DisplayDeathAnimation());
+    }
+
+    IEnumerator DisplayDeathAnimation()
+    {
+        var killScene = Instantiate(KillScene, DeathPanel);
+        var animator = killScene.GetComponent<Animator>();
+        animator.SetBool("KillAlien", true);
+        var lengthAnim = animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
+
+        yield return new WaitForSeconds(lengthAnim);
+        animator.SetBool("KillAlien", false);
+        DeathPanel.gameObject.SetActive(false);
     }
 }
