@@ -2,10 +2,8 @@ using Cinemachine;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -26,6 +24,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     void Start()
     {
+
         SetCountPlayerText();
 
         AddListenersForButton();

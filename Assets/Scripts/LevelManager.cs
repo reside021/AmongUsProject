@@ -29,6 +29,9 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         AddListenersForButton();
 
         var pos = new Vector2(UnityEngine.Random.Range(-2, 2), UnityEngine.Random.Range(-3, 3));
+
+        if (!PhotonNetwork.InRoom) return;
+
         _player = PhotonNetwork.Instantiate(PlayerPrefab.name, pos, Quaternion.identity);
 
         _player.GetComponent<PlayerController>().KillButton = KillButton;
@@ -44,14 +47,8 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         BackButton.onClick.AddListener(Leave);
     }
 
-    private void Update()
-    {
-
-    }
-
     public void Leave()
     {
-        PhotonNetwork.AutomaticallySyncScene = false;
         PhotonNetwork.LeaveRoom();
     }
     public override void OnLeftRoom()
@@ -74,7 +71,6 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         if (photonEvent.Code == 99)
         {
-
             var killerActor = (int)photonEvent.CustomData;
 
             DisplayDeathScreen(killerActor);

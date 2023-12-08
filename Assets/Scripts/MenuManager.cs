@@ -20,7 +20,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public Button ExitGameBtn;
     void Start()
     {
-        PhotonNetwork.AutomaticallySyncScene = true;
 
         AddListenersForButton();
 
@@ -62,6 +61,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
+
         PhotonNetwork.LoadLevel(2);
     }
 

@@ -10,6 +10,7 @@ public class StartManager : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.NickName = "Player " + Random.Range(1000, 9999);
         PhotonNetwork.GameVersion = "1";
+        PhotonNetwork.AutomaticallySyncScene = true;
         PhotonNetwork.ConnectUsingSettings();
     }
 

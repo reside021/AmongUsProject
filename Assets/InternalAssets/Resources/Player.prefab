@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 9078649717441919710}
   - component: {fileID: 1263795880718865394}
   - component: {fileID: 5262882944379228754}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -147,7 +147,7 @@ GameObject:
   - component: {fileID: 4462810924364637525}
   - component: {fileID: 3801263714222255296}
   - component: {fileID: 167137773497909753}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -246,14 +246,14 @@ GameObject:
   m_Component:
   - component: {fileID: 7136423246141579724}
   - component: {fileID: 901026976579272309}
-  - component: {fileID: 7136423246141579730}
-  - component: {fileID: 3152399715921070455}
+  - component: {fileID: 4332382317188115521}
+  - component: {fileID: 8439033455697580815}
   - component: {fileID: 1200564545869266272}
   - component: {fileID: 7136423246141579727}
   - component: {fileID: 2800761282342987038}
   - component: {fileID: -4992902755244847659}
   - component: {fileID: 90966598270182282}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -328,7 +328,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!50 &7136423246141579730
+--- !u!50 &4332382317188115521
 Rigidbody2D:
   serializedVersion: 4
   m_ObjectHideFlags: 0
@@ -336,7 +336,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7136423246141579728}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -349,8 +349,8 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!58 &3152399715921070455
-CircleCollider2D:
+--- !u!70 &8439033455697580815
+CapsuleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -359,12 +359,12 @@ CircleCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  serializedVersion: 2
-  m_Radius: 1.5
+  m_Size: {x: 1.65, y: 2.11}
+  m_Direction: 0
 --- !u!114 &1200564545869266272
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -385,6 +385,7 @@ MonoBehaviour:
   PlayerSprite: {fileID: 21300000, guid: 404715bc3c0cdce4e85ec017dc08ada4, type: 3}
   GhostSprite: {fileID: 21300000, guid: fefb84e059e1075418d1951dbe3f7c6f, type: 3}
   DeadBodyPrefab: {fileID: 7105557607967098023, guid: 426b45c21492c284784394a3e9f96e49, type: 3}
+  KillZone: {fileID: 4511955653851246434, guid: cad734dcfd54d274c90a4f0d4f857c2f, type: 3}
 --- !u!95 &7136423246141579727
 Animator:
   serializedVersion: 5

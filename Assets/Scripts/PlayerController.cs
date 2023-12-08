@@ -1,11 +1,6 @@
-using ExitGames.Client.Photon;
 using Photon.Pun;
-using Photon.Realtime;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -17,10 +12,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
     private Rigidbody2D _rb;
     private Animator _animatorController;
     private SpriteRenderer _spriteRenderer;
-    private GameObject _targetForKill;
     private Button _killBtn;
     private PhotonView _view;
-    private bool _isImposter = false;
     private bool _isRightPlayer = true;
     private bool _isDead = false;
     private bool _animOfDeath = false;
@@ -31,14 +24,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
     public TextMeshProUGUI NickNameText;
 
-    public Material PlayerMat;
-    public Material OutlinePlayerMat;
-    public Material GhostMat;
-
-    public Sprite PlayerSprite;
-    public Sprite GhostSprite;
 
     public GameObject DeadBodyPrefab;
+
+    public GameObject KillZone;
 
     public bool IsDead
     {
@@ -69,9 +58,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
     void Start()
     {
-
-        //PhotonPeer.RegisterType(typeof(Vector2), 242, SerializeVector2Int, DeserializeVector2Int);
-
         _rb = GetComponent<Rigidbody2D>();
         _animatorController = GetComponent<Animator>();
         _view = GetComponent<PhotonView>();
@@ -84,7 +70,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
         if (!_view.IsMine) return;
 
-        _killBtn.onClick.AddListener(Kill);
+        var _isImposter = false;
 
         if (_view.Controller.CustomProperties.ContainsKey("isImposter"))
         {
@@ -93,8 +79,9 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
         if (_isImposter)
         {
-            _killBtn.interactable = false;
-            _camera.cullingMask &= ~(1 << _ghostPlayerLayer); // поменять 
+            var _killZone = Instantiate(KillZone, transform);
+
+            _killZone.GetComponent<KillZoneController>().KillButton = KillButton;
         }
         else
         {
@@ -102,23 +89,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
 
     }
-
-    private void Kill()
-    {
-        if (IsDead) return;
-
-        if (_targetForKill == null) return;
-
-        var targetActor = _targetForKill.GetComponent<PhotonView>().OwnerActorNr;
-        var killerID = GetComponent<PhotonView>().ViewID;
-
-        var options = new RaiseEventOptions { TargetActors = new int[] { targetActor } };
-        var sendOptions = new SendOptions { Reliability = true };
-        PhotonNetwork.RaiseEvent(99, killerID, options, sendOptions);
-
-        _targetForKill.GetComponent<SpriteRenderer>().material = PlayerMat;
-    }
-
 
     private void Update()
     {
@@ -137,10 +107,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
             if (moveHorizontal == 0 && moveVertical == 0)
             {
-                if (IsDead)
-                {
-                    _animatorController.SetBool("Ghosting", true);
-                } else
+                if (!IsDead)
                 {
                     _animatorController.SetBool("Walk", false);
                 }
@@ -152,13 +119,11 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
             var movement = new Vector2(moveHorizontal, moveVertical);
 
-            var move = MoveSpeed * Time.deltaTime * movement;
+            var move = MoveSpeed * Time.deltaTime * movement.normalized;
 
             transform.Translate(move);
-            if (IsDead)
-            {
-                _animatorController.SetBool("Ghosting", true);
-            } else
+
+            if (!IsDead)
             {
                 _animatorController.SetBool("Walk", true);
             }
@@ -178,8 +143,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
         _animatorController.SetBool("Dead", true);
 
-        transform.GetChild(0).gameObject.layer = _ghostPlayerLayer;
-
         var lengthAnim = _animatorController.GetCurrentAnimatorClipInfo(0)[0].clip.length;
         StartCoroutine(CreateDeadBodyCoroutine(lengthAnim));
 
@@ -190,11 +153,23 @@ public class PlayerController : MonoBehaviour, IPunObservable
     {
         yield return new WaitForSeconds(time);
 
-        gameObject.layer = _ghostPlayerLayer;
+        ChangeVisiblePlayer();
 
-        PhotonNetwork.Instantiate(DeadBodyPrefab.name, transform.position, Quaternion.identity);
+        Instantiate(DeadBodyPrefab, transform.position, Quaternion.identity);
 
         _animOfDeath = false;
+
+        _animatorController.SetBool("Ghosting", true);
+    }
+
+    private void ChangeVisiblePlayer()
+    {
+        if (_view.IsMine)
+        {
+            Camera.cullingMask |= (1 << _ghostPlayerLayer);
+        }
+        gameObject.layer = _ghostPlayerLayer;
+        transform.GetChild(0).gameObject.layer = _ghostPlayerLayer;
     }
 
 
@@ -212,77 +187,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
     }
 
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        if (!_isImposter) return;
-
-        if (other.GetComponent<PhotonView>().IsMine) return;
-
-        if (_targetForKill == null) return;
-
-        if (other.gameObject.CompareTag("Player"))
-        {
-            _targetForKill.GetComponent<SpriteRenderer>().material = PlayerMat;
-            _targetForKill = null;
-            _killBtn.interactable = false;
-        }
-    }
-
-    private void OnTriggerStay2D(Collider2D other)
-    {
-        if (!_isImposter) return;
-
-        if (other.GetComponent<PhotonView>().IsMine) return;
-
-        if (other.GetComponent<PlayerController>().IsDead) return;
-
-        if (other.gameObject.CompareTag("Player"))
-        {
-            if (_targetForKill == null)
-            {
-                _targetForKill = other.gameObject;
-            }
-
-            var distForCurrentTarget = Vector3.Distance(_targetForKill.transform.position, _spriteRenderer.transform.position);
-            var distForOtherTarget = Vector3.Distance(other.transform.position, _spriteRenderer.transform.position);
-
-            if (distForOtherTarget < distForCurrentTarget)
-            {
-                _targetForKill.GetComponent<SpriteRenderer>().material = PlayerMat;
-                _targetForKill = other.gameObject;
-            }
-            _targetForKill.GetComponent<SpriteRenderer>().material = OutlinePlayerMat;
-            _killBtn.interactable = true;
-        }
-    }
-
     enum MoveState
     {
         Idle,
         Walk,
         Ghosting
     }
-
-
-    //public static object DeserializeVector2Int(byte[] data)
-    //{
-    //    Vector2 result = new Vector2();
-
-    //    result.x = BitConverter.ToInt32(data, 0);
-    //    result.y = BitConverter.ToInt32(data, 4);
-
-    //    return result;
-    //}
-
-    //public static byte[] SerializeVector2Int(object obj)
-    //{
-    //    var vector = (Vector2)obj;
-
-    //    byte[] result = new byte[8];
-
-    //    BitConverter.GetBytes(vector.x).CopyTo(result, 0);
-    //    BitConverter.GetBytes(vector.y).CopyTo(result, 4);
-
-    //    return result;
-    //}
 }
