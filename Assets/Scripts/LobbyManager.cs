@@ -18,12 +18,28 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public Button StartGameBtn;
     public Button ReadyBtn;
     public TextMeshProUGUI ReadyPlayerText;
+    public Animator LeftFireController;
+    public Animator RightFireController;
 
     private Dictionary<string, bool> _readyStatePlayer = new Dictionary<string, bool>();
     private bool _isReady = false;
+    private Dictionary<int, Vector3> positionForSpawn = new Dictionary<int, Vector3>()
+    {
+        { 0, new Vector3(-2.9f, 5.9f, 0.0f)},
+        { 1, new Vector3(-3.7f, 5.7f, 0.0f)},
+        { 2, new Vector3(-4.5f, 5.5f, 0.0f)},
+        { 3, new Vector3(-5.3f, 5.3f, 0.0f)},
+        { 4, new Vector3(-6.1f, 5.1f, 0.0f)},
+        { 5, new Vector3(2.9f, 5.9f, 0.0f)},
+        { 6, new Vector3(3.7f, 5.7f, 0.0f)},
+        { 7, new Vector3(4.5f, 5.5f, 0.0f)},
+        { 8, new Vector3(5.3f, 5.3f, 0.0f)},
+        { 9, new Vector3(6.1f, 5.1f, 0.0f)},
+    };
 
     void Start()
     {
+        StartFireAnim();
 
         SetCountPlayerText();
 
@@ -37,6 +53,12 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
     }
 
     #region Methods
+
+    private void StartFireAnim()
+    {
+        LeftFireController.Play("LeftFire");
+        RightFireController.Play("RightFire");
+    }
 
     private void SetCountPlayerText()
     {
@@ -92,8 +114,19 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         var pos = new Vector2(Random.Range(-2, 2), Random.Range(-3, 3));
         var player = PhotonNetwork.Instantiate(PlayerPrefab.name, pos, Quaternion.identity);
+
+        var posForSpawn = GetPosSpawn();
+        if (posForSpawn.x > 0) player.GetComponent<SpriteRenderer>().flipX = true;
+
+        player.transform.position = posForSpawn;
         var virtualCamera = Cinemachine.GetComponent<CinemachineVirtualCamera>();
         virtualCamera.Follow = player.transform;
+    }
+
+    private Vector3 GetPosSpawn()
+    {
+        var rand = Random.Range(0, positionForSpawn.Count - 1);
+        return positionForSpawn[rand];
     }
 
     private void StartGame()

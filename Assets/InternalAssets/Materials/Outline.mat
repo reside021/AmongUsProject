@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Player
-  m_Shader: {fileID: -6465566751694194690, guid: a0b0205443b75ea4fbf0f9288383d919, type: 3}
+  m_Name: Outline
+  m_Shader: {fileID: -6465566751694194690, guid: 4cc9bf6b085420b44bd356813c80373d, type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4

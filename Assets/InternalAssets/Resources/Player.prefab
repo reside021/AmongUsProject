@@ -336,7 +336,7 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7136423246141579728}
-  m_BodyType: 0
+  m_BodyType: 1
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
@@ -345,7 +345,7 @@ Rigidbody2D:
   m_AngularDrag: 0.05
   m_GravityScale: 0
   m_Material: {fileID: 0}
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
@@ -363,7 +363,7 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1.65, y: 2.11}
+  m_Size: {x: 1.8840749, y: 2.362831}
   m_Direction: 0
 --- !u!114 &1200564545869266272
 MonoBehaviour:
@@ -379,11 +379,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MoveSpeed: 5
   NickNameText: {fileID: 5262882944379228754}
-  PlayerMat: {fileID: 2100000, guid: 84ca36f9923f6df4eae98e69d488374a, type: 2}
-  OutlinePlayerMat: {fileID: 2100000, guid: ecd4a8ff6729d9b4384122ce17640839, type: 2}
-  GhostMat: {fileID: 2100000, guid: 6e05610bb0c553d41acc26c001c4322c, type: 2}
-  PlayerSprite: {fileID: 21300000, guid: 404715bc3c0cdce4e85ec017dc08ada4, type: 3}
-  GhostSprite: {fileID: 21300000, guid: fefb84e059e1075418d1951dbe3f7c6f, type: 3}
   DeadBodyPrefab: {fileID: 7105557607967098023, guid: 426b45c21492c284784394a3e9f96e49, type: 3}
   KillZone: {fileID: 4511955653851246434, guid: cad734dcfd54d274c90a4f0d4f857c2f, type: 3}
 --- !u!95 &7136423246141579727
@@ -471,6 +466,9 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 0
     Name: Dead
+  - Type: 4
+    SynchronizeType: 0
+    Name: Spawn
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0

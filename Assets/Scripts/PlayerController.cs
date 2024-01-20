@@ -10,13 +10,15 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
     private MoveState _moveState = MoveState.Idle;
     private Rigidbody2D _rb;
+    private Collider2D _collider;
     private Animator _animatorController;
     private SpriteRenderer _spriteRenderer;
     private Button _killBtn;
     private PhotonView _view;
     private bool _isRightPlayer = true;
     private bool _isDead = false;
-    private bool _animOfDeath = false;
+    private bool _isAnimOfDeath = false;
+    private bool _isAnimSpwan = false;
     private Camera _camera;
     private LayerMask _ghostPlayerLayer;
 
@@ -59,12 +61,15 @@ public class PlayerController : MonoBehaviour, IPunObservable
     void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
+        _collider = GetComponent<CapsuleCollider2D>();
         _animatorController = GetComponent<Animator>();
         _view = GetComponent<PhotonView>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _ghostPlayerLayer = LayerMask.NameToLayer("GhostPlayer");
 
         NickNameText.text = _view.Owner.NickName;
+
+        StartSpawnAnim();
 
         if (SceneManager.GetActiveScene().name != "GameScene") return;
 
@@ -99,7 +104,9 @@ public class PlayerController : MonoBehaviour, IPunObservable
     {
         if (_view.IsMine)
         {
-            if (_animOfDeath) return;
+            if (_isAnimSpwan) return;
+
+            if (_isAnimOfDeath) return;
 
             float moveHorizontal = Input.GetAxis("Horizontal");
 
@@ -110,6 +117,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
                 if (!IsDead)
                 {
                     _animatorController.SetBool("Walk", false);
+                    _rb.velocity = Vector2.zero;
                 }
                 return;
             }
@@ -119,9 +127,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
             var movement = new Vector2(moveHorizontal, moveVertical);
 
-            var move = MoveSpeed * Time.deltaTime * movement.normalized;
+            var move = MoveSpeed  * movement.normalized;
 
-            transform.Translate(move);
+            //transform.Translate(move);
+            _rb.velocity = move;
 
             if (!IsDead)
             {
@@ -137,9 +146,29 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
     }
 
+    private void StartSpawnAnim()
+    {
+        _isAnimSpwan = true;
+        _animatorController.SetBool("Spawn", true);
+
+        var lengthAnim = _animatorController.GetCurrentAnimatorClipInfo(0)[0].clip.length;
+        StartCoroutine(StopSpawnAnim(lengthAnim));
+    }
+
+    IEnumerator StopSpawnAnim(float time)
+    {
+        yield return new WaitForSeconds(time);
+
+        _animatorController.SetBool("Spawn", false);
+
+        _rb.bodyType = RigidbodyType2D.Dynamic;
+
+        _isAnimSpwan = false;
+    }
+
     private void Death()
     {
-        _animOfDeath = true;
+        _isAnimOfDeath = true;
 
         _animatorController.SetBool("Dead", true);
 
@@ -157,7 +186,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
         Instantiate(DeadBodyPrefab, transform.position, Quaternion.identity);
 
-        _animOfDeath = false;
+        _isAnimOfDeath = false;
 
         _animatorController.SetBool("Ghosting", true);
     }
