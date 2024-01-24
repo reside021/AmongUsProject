@@ -8,9 +8,12 @@ public class KillZoneController : MonoBehaviour
 {
     private GameObject _targetForKill;
     private Button _killBtn;
+    private Button _ventBtn;
 
     public Material PlayerMat;
     public Material OutlinePlayerMat;
+    public Material VentMat;
+    public Material OutlineVentMat;
 
 
     public Button KillButton
@@ -20,10 +23,18 @@ public class KillZoneController : MonoBehaviour
 
     }
 
+    public Button VentButton
+    {
+        get { return _ventBtn; }
+        set { _ventBtn = value; }
+
+    }
+
     void Start()
     {
-        _killBtn.onClick.AddListener(Kill);
-        _killBtn.interactable = false;
+        KillButton.onClick.AddListener(Kill);
+        KillButton.interactable = false;
+        VentButton.interactable = false;
     }
 
     private void Kill()
@@ -43,6 +54,12 @@ public class KillZoneController : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D other)
     {
+        if (other.CompareTag("Vent"))
+        {
+            other.gameObject.GetComponent<SpriteRenderer>().material = OutlineVentMat;
+            VentButton.interactable = true;
+        }
+
         if (other.CompareTag("Player"))
         {
             if (_targetForKill == null)
@@ -59,20 +76,27 @@ public class KillZoneController : MonoBehaviour
                 _targetForKill = other.gameObject;
             }
             _targetForKill.GetComponent<SpriteRenderer>().material = OutlinePlayerMat;
-            _killBtn.interactable = true;
+            KillButton.interactable = true;
         }
     }
 
 
     private void OnTriggerExit2D(Collider2D other)
     {
+        if (other.CompareTag("Vent"))
+        {
+            other.gameObject.GetComponent<SpriteRenderer>().material = VentMat;
+            VentButton.interactable = false;
+        }
+
+
         if (_targetForKill == null) return;
 
         if (other.CompareTag("Player"))
         {
             _targetForKill.GetComponent<SpriteRenderer>().material = PlayerMat;
             _targetForKill = null;
-            _killBtn.interactable = false;
+            KillButton.interactable = false;
         }
     }
 }

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - AttackZone
   - Dead Body
+  - Vent
   layers:
   - Default
   - TransparentFX

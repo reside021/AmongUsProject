@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     private Animator _animatorController;
     private SpriteRenderer _spriteRenderer;
     private Button _killBtn;
+    private Button _ventBtn;
     private PhotonView _view;
     private bool _isRightPlayer = true;
     private bool _isDead = false;
@@ -49,6 +50,12 @@ public class PlayerController : MonoBehaviour, IPunObservable
     {
         get { return _killBtn; }
         set { _killBtn = value; }
+
+    }
+    public Button VentButton
+    {
+        get { return _ventBtn; }
+        set { _ventBtn = value; }
 
     }
 
@@ -87,10 +94,12 @@ public class PlayerController : MonoBehaviour, IPunObservable
             var _killZone = Instantiate(KillZone, transform);
 
             _killZone.GetComponent<KillZoneController>().KillButton = KillButton;
+            _killZone.GetComponent<KillZoneController>().VentButton = VentButton;
         }
         else
         {
-            _killBtn.gameObject.SetActive(false);
+            KillButton.gameObject.SetActive(false);
+            VentButton.gameObject.SetActive(false);
         }
 
     }

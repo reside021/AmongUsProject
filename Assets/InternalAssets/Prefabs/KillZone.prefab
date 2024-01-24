@@ -63,3 +63,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerMat: {fileID: 2100000, guid: 84ca36f9923f6df4eae98e69d488374a, type: 2}
   OutlinePlayerMat: {fileID: 2100000, guid: ecd4a8ff6729d9b4384122ce17640839, type: 2}
+  VentMat: {fileID: 2100000, guid: 31dec3bb1cfee304f9b5613a393baa13, type: 2}
+  OutlineVentMat: {fileID: 2100000, guid: 432c1589bac4b4141bb42fb8d0e40fe7, type: 2}

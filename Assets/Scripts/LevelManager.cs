@@ -16,6 +16,7 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public GameObject Cinemachine;
     public Button BackButton;
     public Button KillButton;
+    public Button VentButton;
     public Camera Camera;
     public Transform DeathPanel;
     public GameObject KillScene;
@@ -35,6 +36,7 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         _player = PhotonNetwork.Instantiate(PlayerPrefab.name, pos, Quaternion.identity);
 
         _player.GetComponent<PlayerController>().KillButton = KillButton;
+        _player.GetComponent<PlayerController>().VentButton = VentButton;
         _player.GetComponent<PlayerController>().Camera = Camera;
 
         var virtualCamera = Cinemachine.GetComponent<CinemachineVirtualCamera>();
