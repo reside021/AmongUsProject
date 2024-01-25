@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     private Button _killBtn;
     private Button _ventBtn;
     private PhotonView _view;
-    private bool _isRightPlayer = true;
+    private bool _isRightPlayer = true; 
     private bool _isDead = false;
     private bool _isAnimOfDeath = false;
     private bool _isAnimSpwan = false;

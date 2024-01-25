@@ -1,12 +1,14 @@
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class KillZoneController : MonoBehaviour
 {
     private GameObject _targetForKill;
+    private GameObject _targetForVent;
     private Button _killBtn;
     private Button _ventBtn;
 
@@ -34,6 +36,7 @@ public class KillZoneController : MonoBehaviour
     {
         KillButton.onClick.AddListener(Kill);
         KillButton.interactable = false;
+        VentButton.onClick.AddListener(GoVent);
         VentButton.interactable = false;
     }
 
@@ -51,13 +54,34 @@ public class KillZoneController : MonoBehaviour
         _targetForKill.GetComponent<SpriteRenderer>().material = PlayerMat;
     }
 
+    private void GoVent()
+    {
+        StartCoroutine(MoveVent());
+    }
+
+    IEnumerator MoveVent()
+    {
+        var ventilation = _targetForVent.transform.parent;
+        var animator = ventilation.GetComponent<Animator>();
+        animator.SetBool("MoveVent", true);
+        var lengthAnim = animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
+
+        yield return new WaitForSeconds(lengthAnim);
+
+        animator.SetBool("MoveVent", false);
+    }
 
     private void OnTriggerStay2D(Collider2D other)
     {
         if (other.CompareTag("Vent"))
         {
-            other.gameObject.GetComponent<SpriteRenderer>().material = OutlineVentMat;
-            VentButton.interactable = true;
+            if (_targetForVent == null)
+            {
+                _targetForVent = other.gameObject;
+
+                other.gameObject.GetComponent<SpriteRenderer>().material = OutlineVentMat;
+                VentButton.interactable = true;
+            }
         }
 
         if (other.CompareTag("Player"))
@@ -86,6 +110,7 @@ public class KillZoneController : MonoBehaviour
         if (other.CompareTag("Vent"))
         {
             other.gameObject.GetComponent<SpriteRenderer>().material = VentMat;
+            _targetForVent = null;
             VentButton.interactable = false;
         }
 
