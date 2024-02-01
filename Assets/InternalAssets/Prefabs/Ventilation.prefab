@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5400082923391599825}
   - component: {fileID: 5400082923391599824}
+  - component: {fileID: 8700048708522481257}
   m_Layer: 0
   m_Name: Ventilation
   m_TagString: Untagged
@@ -54,6 +55,19 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+--- !u!114 &8700048708522481257
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5400082923391599827}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00d9db6db8b7cc847b6451f8c47a1733, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  VentUI: {fileID: 0}
 --- !u!1 &6010541699910483167
 GameObject:
   m_ObjectHideFlags: 0
@@ -199,6 +213,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 5642190756579881349, guid: 7b766efa94959bc47a78c529eb7e6d82, type: 3}
+    - {fileID: 5099400701690957226, guid: 7b766efa94959bc47a78c529eb7e6d82, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 7b766efa94959bc47a78c529eb7e6d82, type: 3}
 --- !u!4 &5410909569777574372 stripped
 Transform:

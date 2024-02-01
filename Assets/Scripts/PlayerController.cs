@@ -1,4 +1,5 @@
 using Photon.Pun;
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -19,7 +20,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
     private bool _isRightPlayer = true; 
     private bool _isDead = false;
     private bool _isAnimOfDeath = false;
-    private bool _isAnimSpwan = false;
+    private bool _isAnimSpawn = false;
+    private bool _isInVent = false;
     private Camera _camera;
     private LayerMask _ghostPlayerLayer;
 
@@ -27,6 +29,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
     public TextMeshProUGUI NickNameText;
 
+    public GameObject VentArrow;
 
     public GameObject DeadBodyPrefab;
 
@@ -64,6 +67,22 @@ public class PlayerController : MonoBehaviour, IPunObservable
         get { return _camera; }
         set { _camera = value; }
     }
+
+    private void OnEnable()
+    {
+        KillZoneController.OnMoveInVent += MoveInVent;
+    }
+
+    private void OnDisable()
+    {
+        KillZoneController.OnMoveInVent -= MoveInVent;
+    }
+
+    private void MoveInVent()
+    {
+        _isInVent = true;
+    }
+
 
     void Start()
     {
@@ -113,9 +132,11 @@ public class PlayerController : MonoBehaviour, IPunObservable
     {
         if (_view.IsMine)
         {
-            if (_isAnimSpwan) return;
+            if (_isAnimSpawn) return;
 
             if (_isAnimOfDeath) return;
+
+            if (_isInVent) return;
 
             float moveHorizontal = Input.GetAxis("Horizontal");
 
@@ -138,7 +159,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
             var move = MoveSpeed  * movement.normalized;
 
-            //transform.Translate(move);
             _rb.velocity = move;
 
             if (!IsDead)
@@ -157,7 +177,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
     private void StartSpawnAnim()
     {
-        _isAnimSpwan = true;
+        _isAnimSpawn = true;
         _animatorController.SetBool("Spawn", true);
 
         var lengthAnim = _animatorController.GetCurrentAnimatorClipInfo(0)[0].clip.length;
@@ -172,7 +192,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
         _rb.bodyType = RigidbodyType2D.Dynamic;
 
-        _isAnimSpwan = false;
+        _isAnimSpawn = false;
     }
 
     private void Death()

@@ -1,7 +1,7 @@
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
-using System.Collections;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,12 +11,19 @@ public class KillZoneController : MonoBehaviour
     private GameObject _targetForVent;
     private Button _killBtn;
     private Button _ventBtn;
+    private bool _inVent = false;
+
+    private LayerMask _ventLayer;
+    private LayerMask _playerLayer;
 
     public Material PlayerMat;
     public Material OutlinePlayerMat;
     public Material VentMat;
     public Material OutlineVentMat;
 
+
+    public static Action OnMoveInVent;
+    public static Action OnMoveOutVent;
 
     public Button KillButton
     {
@@ -36,8 +43,11 @@ public class KillZoneController : MonoBehaviour
     {
         KillButton.onClick.AddListener(Kill);
         KillButton.interactable = false;
-        VentButton.onClick.AddListener(GoVent);
+        VentButton.onClick.AddListener(VentOpen);
         VentButton.interactable = false;
+
+        _ventLayer = LayerMask.NameToLayer("VentZone");
+        _playerLayer = LayerMask.NameToLayer("Player");
     }
 
     private void Kill()
@@ -54,22 +64,49 @@ public class KillZoneController : MonoBehaviour
         _targetForKill.GetComponent<SpriteRenderer>().material = PlayerMat;
     }
 
-    private void GoVent()
-    {
-        StartCoroutine(MoveVent());
-    }
-
-    IEnumerator MoveVent()
+    private void VentOpen()
     {
         var ventilation = _targetForVent.transform.parent;
         var animator = ventilation.GetComponent<Animator>();
-        animator.SetBool("MoveVent", true);
-        var lengthAnim = animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
 
-        yield return new WaitForSeconds(lengthAnim);
+        if (_inVent)
+        {
+            PlayerMoveOutVent();
+            animator.SetTrigger("MoveOutVent");
+        } 
+        else 
+        {
+            PlayerMoveToVent();
+            animator.SetTrigger("MoveInVent");
+        }
 
-        animator.SetBool("MoveVent", false);
     }
+
+    private void PlayerMoveOutVent()
+    {
+        OnMoveOutVent?.Invoke();
+
+        var player = transform.parent;
+
+        player.gameObject.layer = _playerLayer;
+        player.transform.GetChild(0).gameObject.layer = _playerLayer;
+
+        _inVent = false;
+    }
+
+    private void PlayerMoveToVent()
+    {
+        OnMoveInVent?.Invoke();
+
+        var player = transform.parent;
+        player.position = _targetForVent.transform.position + new Vector3(0.0f, 0.8f, 0.0f);
+
+        player.gameObject.layer = _ventLayer;
+        player.transform.GetChild(0).gameObject.layer = _ventLayer;
+
+        _inVent = true;
+    }
+
 
     private void OnTriggerStay2D(Collider2D other)
     {

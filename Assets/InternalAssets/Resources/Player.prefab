@@ -379,6 +379,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MoveSpeed: 5
   NickNameText: {fileID: 5262882944379228754}
+  VentArrow: {fileID: 0}
   DeadBodyPrefab: {fileID: 7105557607967098023, guid: 426b45c21492c284784394a3e9f96e49, type: 3}
   KillZone: {fileID: 4511955653851246434, guid: cad734dcfd54d274c90a4f0d4f857c2f, type: 3}
 --- !u!95 &7136423246141579727
@@ -469,6 +470,9 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 0
     Name: Spawn
+  - Type: 9
+    SynchronizeType: 0
+    Name: VentIn
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
