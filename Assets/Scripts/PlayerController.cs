@@ -71,11 +71,18 @@ public class PlayerController : MonoBehaviour, IPunObservable
     private void OnEnable()
     {
         KillZoneController.OnMoveInVent += MoveInVent;
+        KillZoneController.OnMoveOutVent += MoveOutVent;
     }
 
     private void OnDisable()
     {
         KillZoneController.OnMoveInVent -= MoveInVent;
+        KillZoneController.OnMoveOutVent += MoveOutVent;
+    }
+
+    private void MoveOutVent()
+    {
+        _isInVent = false;
     }
 
     private void MoveInVent()

@@ -2,6 +2,7 @@ using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -71,8 +72,8 @@ public class KillZoneController : MonoBehaviour
 
         if (_inVent)
         {
-            PlayerMoveOutVent();
             animator.SetTrigger("MoveOutVent");
+            StartCoroutine(WaitForAnimation(animator));
         } 
         else 
         {
@@ -80,6 +81,13 @@ public class KillZoneController : MonoBehaviour
             animator.SetTrigger("MoveInVent");
         }
 
+    }
+
+    IEnumerator WaitForAnimation(Animator animator)
+    {
+        var lengthAnim = animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
+        yield return new WaitForSeconds(lengthAnim);
+        PlayerMoveOutVent();
     }
 
     private void PlayerMoveOutVent()
@@ -99,7 +107,7 @@ public class KillZoneController : MonoBehaviour
         OnMoveInVent?.Invoke();
 
         var player = transform.parent;
-        player.position = _targetForVent.transform.position + new Vector3(0.0f, 0.8f, 0.0f);
+        player.position = _targetForVent.transform.position + new Vector3(0.0f, 0.6f, 0.0f);
 
         player.gameObject.layer = _ventLayer;
         player.transform.GetChild(0).gameObject.layer = _ventLayer;
