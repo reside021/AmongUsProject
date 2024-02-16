@@ -649,7 +649,7 @@ GameObject:
   - component: {fileID: 3528299886877235481}
   - component: {fileID: 3528299886877235480}
   m_Layer: 0
-  m_Name: '[BG] The Skeld_ Storage 2'
+  m_Name: '[BG] The Skeld_ Storage'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

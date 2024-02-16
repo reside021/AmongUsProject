@@ -87,6 +87,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
     private void MoveInVent()
     {
+        _rb.velocity = Vector2.zero;
         _isInVent = true;
     }
 

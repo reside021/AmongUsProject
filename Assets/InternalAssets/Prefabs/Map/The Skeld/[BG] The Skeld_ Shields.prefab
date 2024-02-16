@@ -1278,7 +1278,7 @@ GameObject:
   - component: {fileID: 6955281491491558762}
   - component: {fileID: 6955281491491558763}
   m_Layer: 0
-  m_Name: '[BG] The Skeld_ Shields 1'
+  m_Name: '[BG] The Skeld_ Shields'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

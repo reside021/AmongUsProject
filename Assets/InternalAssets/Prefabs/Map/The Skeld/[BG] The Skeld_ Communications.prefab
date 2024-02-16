@@ -127,7 +127,7 @@ GameObject:
   - component: {fileID: 5048187008853503553}
   - component: {fileID: 5048187008853503554}
   m_Layer: 0
-  m_Name: '[BG] The Skeld_ Communications 1'
+  m_Name: '[BG] The Skeld_ Communications'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

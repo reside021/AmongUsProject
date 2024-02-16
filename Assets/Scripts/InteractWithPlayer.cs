@@ -12,7 +12,7 @@ public class InteractWithPlayer : MonoBehaviour
     }
     public void DeactivatedUI()
     {
-        VentUI.SetActive(true);
+        VentUI.SetActive(false);
     }
 
 }

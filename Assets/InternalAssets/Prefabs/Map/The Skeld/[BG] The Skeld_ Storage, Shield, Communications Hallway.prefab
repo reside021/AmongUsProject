@@ -185,7 +185,7 @@ GameObject:
   - component: {fileID: 6561010294243581679}
   - component: {fileID: 6561010294243581678}
   m_Layer: 0
-  m_Name: '[BG] The Skeld_ Storage, Shield, Communications Hallway 1'
+  m_Name: '[BG] The Skeld_ Storage, Shield, Communications Hallway'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

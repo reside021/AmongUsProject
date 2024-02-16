@@ -40,11 +40,21 @@ public class KillZoneController : MonoBehaviour
 
     }
 
+    private void OnEnable()
+    {
+        VentsManager.ChangeVents += ChangeVents;
+    }
+
+    private void OnDisable()
+    {
+        VentsManager.ChangeVents -= ChangeVents;
+    }
+
     void Start()
     {
         KillButton.onClick.AddListener(Kill);
         KillButton.interactable = false;
-        VentButton.onClick.AddListener(VentOpen);
+        VentButton.onClick.AddListener(InteractWithVent);
         VentButton.interactable = false;
 
         _ventLayer = LayerMask.NameToLayer("VentZone");
@@ -65,7 +75,22 @@ public class KillZoneController : MonoBehaviour
         _targetForKill.GetComponent<SpriteRenderer>().material = PlayerMat;
     }
 
-    private void VentOpen()
+    private void ChangeVents(Transform targetVents)
+    {
+        if (_inVent)
+        {
+            var ventSource = _targetForVent.transform.parent;
+            var deactivatedSource = ventSource.GetComponent<InteractWithPlayer>();
+            deactivatedSource.DeactivatedUI();
+
+            MoveToVents(targetVents);
+
+            var activateTarget = targetVents.GetComponent<InteractWithPlayer>();
+            activateTarget.ActivatedUI();
+        }
+    }
+
+    private void InteractWithVent()
     {
         var ventilation = _targetForVent.transform.parent;
         var animator = ventilation.GetComponent<Animator>();
@@ -90,14 +115,12 @@ public class KillZoneController : MonoBehaviour
         PlayerMoveOutVent();
     }
 
+
     private void PlayerMoveOutVent()
     {
         OnMoveOutVent?.Invoke();
 
-        var player = transform.parent;
-
-        player.gameObject.layer = _playerLayer;
-        player.transform.GetChild(0).gameObject.layer = _playerLayer;
+        ChangePlayerLayer(_playerLayer);
 
         _inVent = false;
     }
@@ -106,15 +129,26 @@ public class KillZoneController : MonoBehaviour
     {
         OnMoveInVent?.Invoke();
 
-        var player = transform.parent;
-        player.position = _targetForVent.transform.position + new Vector3(0.0f, 0.6f, 0.0f);
+        MoveToVents(_targetForVent.transform);
 
-        player.gameObject.layer = _ventLayer;
-        player.transform.GetChild(0).gameObject.layer = _ventLayer;
+        ChangePlayerLayer(_ventLayer);
 
         _inVent = true;
     }
 
+
+    private void MoveToVents(Transform target)
+    {
+        var player = transform.parent;
+        player.position = target.position + new Vector3(0.0f, 0.6f, 0.0f);
+    }
+
+    private void ChangePlayerLayer(LayerMask targetLayer)
+    {
+        var player = transform.parent;
+        player.gameObject.layer = targetLayer;
+        player.transform.GetChild(0).gameObject.layer = targetLayer;
+    }
 
     private void OnTriggerStay2D(Collider2D other)
     {
