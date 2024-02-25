@@ -17,7 +17,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
     private Button _killBtn;
     private Button _ventBtn;
     private PhotonView _view;
-    private bool _isRightPlayer = true; 
     private bool _isDead = false;
     private bool _isAnimOfDeath = false;
     private bool _isAnimSpawn = false;
@@ -36,6 +35,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
     public GameObject DeadBodyPrefab;
 
     public GameObject KillZone;
+
+    public bool IsRightPlayer = true;
 
     public bool IsDead
     {
@@ -155,8 +156,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
                 return;
             }
 
-            if (moveHorizontal > 0) _isRightPlayer = true;
-            if (moveHorizontal < 0) _isRightPlayer = false;
+            if (moveHorizontal > 0) IsRightPlayer = true;
+            if (moveHorizontal < 0) IsRightPlayer = false;
 
             var movement = new Vector2(moveHorizontal, moveVertical);
 
@@ -171,7 +172,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
         }
 
-        if (_isRightPlayer)
+        if (IsRightPlayer)
             _spriteRenderer.flipX = false;
         else
             _spriteRenderer.flipX = true;
@@ -181,6 +182,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     private void StartSpawnAnim()
     {
         _isAnimSpawn = true;
+        _spriteRenderer.flipX = !IsRightPlayer;
         _animatorController.SetBool("Spawn", true);
 
         var lengthAnim = _animatorController.GetCurrentAnimatorClipInfo(0)[0].clip.length;
@@ -241,6 +243,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
             ChangePlayerLayer(_ventLayer);
         } else
         {
+            IsRightPlayer = true;
+            _spriteRenderer.flipX = !IsRightPlayer;
             ChangePlayerLayer(_playerLayer);
         }
     }
@@ -256,13 +260,13 @@ public class PlayerController : MonoBehaviour, IPunObservable
     {
         if (stream.IsWriting)
         {
-            stream.SendNext(_isRightPlayer);
+            stream.SendNext(IsRightPlayer);
             stream.SendNext(IsDead);
             stream.SendNext(IsInVent);
         }
         else
         {
-            _isRightPlayer = (bool)stream.ReceiveNext();
+            IsRightPlayer = (bool)stream.ReceiveNext();
             IsDead = (bool)stream.ReceiveNext();
             IsInVent = (bool)stream.ReceiveNext();
         }

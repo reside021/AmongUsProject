@@ -116,7 +116,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
         var player = PhotonNetwork.Instantiate(PlayerPrefab.name, pos, Quaternion.identity);
 
         var posForSpawn = GetPosSpawn();
-        if (posForSpawn.x > 0) player.GetComponent<SpriteRenderer>().flipX = true;
+        if (posForSpawn.x > 0) player.GetComponent<PlayerController>().IsRightPlayer = false;
 
         player.transform.position = posForSpawn;
         var virtualCamera = Cinemachine.GetComponent<CinemachineVirtualCamera>();
