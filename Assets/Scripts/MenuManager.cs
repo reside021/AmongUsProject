@@ -61,7 +61,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedRoom()
     {
-
         PhotonNetwork.LoadLevel(2);
     }
 

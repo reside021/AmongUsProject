@@ -24,6 +24,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
     private bool _isInVent = false;
     private Camera _camera;
     private LayerMask _ghostPlayerLayer;
+    private LayerMask _ventLayer;
+    private LayerMask _playerLayer;
 
     public float MoveSpeed = 10f;
 
@@ -49,6 +51,20 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
     }
 
+    public bool IsInVent
+    {
+        get { return _isInVent; }
+        set
+        {
+            if (_isInVent != value)
+            {
+                _isInVent = value;
+                Vent();
+            }
+
+        }
+    }
+
     public Button KillButton
     {
         get { return _killBtn; }
@@ -68,29 +84,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
         set { _camera = value; }
     }
 
-    private void OnEnable()
-    {
-        KillZoneController.OnMoveInVent += MoveInVent;
-        KillZoneController.OnMoveOutVent += MoveOutVent;
-    }
-
-    private void OnDisable()
-    {
-        KillZoneController.OnMoveInVent -= MoveInVent;
-        KillZoneController.OnMoveOutVent += MoveOutVent;
-    }
-
-    private void MoveOutVent()
-    {
-        _isInVent = false;
-    }
-
-    private void MoveInVent()
-    {
-        _rb.velocity = Vector2.zero;
-        _isInVent = true;
-    }
-
 
     void Start()
     {
@@ -100,6 +93,8 @@ public class PlayerController : MonoBehaviour, IPunObservable
         _view = GetComponent<PhotonView>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
         _ghostPlayerLayer = LayerMask.NameToLayer("GhostPlayer");
+        _ventLayer = LayerMask.NameToLayer("VentZone");
+        _playerLayer = LayerMask.NameToLayer("Player");
 
         NickNameText.text = _view.Owner.NickName;
 
@@ -152,10 +147,10 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
             if (moveHorizontal == 0 && moveVertical == 0)
             {
+                _rb.velocity = Vector2.zero;
                 if (!IsDead)
                 {
                     _animatorController.SetBool("Walk", false);
-                    _rb.velocity = Vector2.zero;
                 }
                 return;
             }
@@ -203,6 +198,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         _isAnimSpawn = false;
     }
 
+
     private void Death()
     {
         _isAnimOfDeath = true;
@@ -234,8 +230,25 @@ public class PlayerController : MonoBehaviour, IPunObservable
         {
             Camera.cullingMask |= (1 << _ghostPlayerLayer);
         }
-        gameObject.layer = _ghostPlayerLayer;
-        transform.GetChild(0).gameObject.layer = _ghostPlayerLayer;
+        ChangePlayerLayer(_ghostPlayerLayer);
+    }
+
+    private void Vent()
+    {
+        if (_isInVent)
+        {
+            _rb.velocity = Vector2.zero;
+            ChangePlayerLayer(_ventLayer);
+        } else
+        {
+            ChangePlayerLayer(_playerLayer);
+        }
+    }
+
+    private void ChangePlayerLayer(LayerMask targetLayer)
+    {
+        gameObject.layer = targetLayer;
+        transform.GetChild(0).gameObject.layer = targetLayer;
     }
 
 
@@ -245,11 +258,13 @@ public class PlayerController : MonoBehaviour, IPunObservable
         {
             stream.SendNext(_isRightPlayer);
             stream.SendNext(IsDead);
+            stream.SendNext(IsInVent);
         }
         else
         {
             _isRightPlayer = (bool)stream.ReceiveNext();
             IsDead = (bool)stream.ReceiveNext();
+            IsInVent = (bool)stream.ReceiveNext();
         }
     }
 

@@ -89,9 +89,6 @@ public class VentsManager : MonoBehaviour
 
     void Start()
     {
-
-        Debug.Log("START");
-
         CafeteriaToWeaponsBtn.onClick.AddListener(ToWeapons);
         CafeteriaToNavHallWayBtn.onClick.AddListener(ToNavHallWay);
         CafeteriaToMedBayBtn.onClick.AddListener(ToMedBay);
@@ -155,13 +152,11 @@ public class VentsManager : MonoBehaviour
 
     private void ToCafeteria()
     {
-        Debug.Log("ToCafeteria");
         ChangeVents?.Invoke(CafeteriaVents);
     }
 
     private void ToWeapons()
     {
-        Debug.Log("ToWeapons");
         ChangeVents?.Invoke(WeaponsVents);
     }
 

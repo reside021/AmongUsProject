@@ -12,10 +12,22 @@ public class KillZoneController : MonoBehaviour
     private GameObject _targetForVent;
     private Button _killBtn;
     private Button _ventBtn;
-    private bool _inVent = false;
-
     private LayerMask _ventLayer;
-    private LayerMask _playerLayer;
+    private LayerMask _attackLayer;
+
+    private bool _isInVent
+    {
+        get
+        {
+            return transform.parent.GetComponent<PlayerController>().IsInVent;
+        }
+
+        set
+        {
+            transform.parent.GetComponent<PlayerController>().IsInVent = value;
+        }
+    }
+
 
     public Material PlayerMat;
     public Material OutlinePlayerMat;
@@ -40,6 +52,7 @@ public class KillZoneController : MonoBehaviour
 
     }
 
+
     private void OnEnable()
     {
         VentsManager.ChangeVents += ChangeVents;
@@ -52,13 +65,15 @@ public class KillZoneController : MonoBehaviour
 
     void Start()
     {
+
         KillButton.onClick.AddListener(Kill);
         KillButton.interactable = false;
         VentButton.onClick.AddListener(InteractWithVent);
         VentButton.interactable = false;
 
         _ventLayer = LayerMask.NameToLayer("VentZone");
-        _playerLayer = LayerMask.NameToLayer("Player");
+        _attackLayer = LayerMask.NameToLayer("AttackZone");
+
     }
 
     private void Kill()
@@ -77,7 +92,7 @@ public class KillZoneController : MonoBehaviour
 
     private void ChangeVents(Transform targetVents)
     {
-        if (_inVent)
+        if (_isInVent)
         {
             var ventSource = _targetForVent.transform.parent;
             var deactivatedSource = ventSource.GetComponent<InteractWithPlayer>();
@@ -94,46 +109,51 @@ public class KillZoneController : MonoBehaviour
     {
         var ventilation = _targetForVent.transform.parent;
         var animator = ventilation.GetComponent<Animator>();
+        var interactWithPLayer = ventilation.GetComponent<InteractWithPlayer>();
 
-        if (_inVent)
+        if (_isInVent)
         {
-            animator.SetTrigger("MoveOutVent");
-            StartCoroutine(WaitForAnimation(animator));
+            animator.SetBool("OutVent", true);
+            interactWithPLayer.DeactivatedUI();
+            StartCoroutine(WaitOutVentAnim(animator));
         } 
         else 
         {
-            PlayerMoveToVent();
-            animator.SetTrigger("MoveInVent");
+            interactWithPLayer.ActivatedUI();
+            PlayerMoveToVent(animator);
         }
 
     }
 
-    IEnumerator WaitForAnimation(Animator animator)
+    IEnumerator WaitOutVentAnim(Animator animator)
     {
         var lengthAnim = animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
         yield return new WaitForSeconds(lengthAnim);
+        animator.SetBool("OutVent", false);
         PlayerMoveOutVent();
     }
 
 
     private void PlayerMoveOutVent()
     {
-        OnMoveOutVent?.Invoke();
-
-        ChangePlayerLayer(_playerLayer);
-
-        _inVent = false;
+        gameObject.layer = _attackLayer;
+        _isInVent = false;
     }
 
-    private void PlayerMoveToVent()
+    private void PlayerMoveToVent(Animator animator)
     {
-        OnMoveInVent?.Invoke();
-
+        gameObject.layer = _ventLayer;
         MoveToVents(_targetForVent.transform);
+        _isInVent = true;
+        animator.SetBool("InVent", true);
+        StartCoroutine(WaitInVentAnim(animator));
+    }
 
-        ChangePlayerLayer(_ventLayer);
-
-        _inVent = true;
+    IEnumerator WaitInVentAnim(Animator animator)
+    {
+        var lengthAnim = animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
+        yield return new WaitForSeconds(lengthAnim);
+        animator.SetBool("InVent", false);
     }
 
 
@@ -141,13 +161,6 @@ public class KillZoneController : MonoBehaviour
     {
         var player = transform.parent;
         player.position = target.position + new Vector3(0.0f, 0.6f, 0.0f);
-    }
-
-    private void ChangePlayerLayer(LayerMask targetLayer)
-    {
-        var player = transform.parent;
-        player.gameObject.layer = targetLayer;
-        player.transform.GetChild(0).gameObject.layer = targetLayer;
     }
 
     private void OnTriggerStay2D(Collider2D other)
@@ -192,9 +205,6 @@ public class KillZoneController : MonoBehaviour
             _targetForVent = null;
             VentButton.interactable = false;
         }
-
-
-        if (_targetForKill == null) return;
 
         if (other.CompareTag("Player"))
         {
