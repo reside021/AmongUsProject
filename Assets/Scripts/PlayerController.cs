@@ -14,8 +14,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
     private Collider2D _collider;
     private Animator _animatorController;
     private SpriteRenderer _spriteRenderer;
-    private Button _killBtn;
-    private Button _ventBtn;
     private PhotonView _view;
     private bool _isDead = false;
     private bool _isAnimOfDeath = false;
@@ -33,8 +31,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
     public GameObject VentArrow;
 
     public GameObject DeadBodyPrefab;
-
-    public GameObject KillZone;
 
     public bool IsRightPlayer = true;
 
@@ -66,19 +62,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
         }
     }
 
-    public Button KillButton
-    {
-        get { return _killBtn; }
-        set { _killBtn = value; }
-
-    }
-    public Button VentButton
-    {
-        get { return _ventBtn; }
-        set { _ventBtn = value; }
-
-    }
-
     public Camera Camera 
     {
         get { return _camera; }
@@ -101,29 +84,29 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
         StartSpawnAnim();
 
-        if (SceneManager.GetActiveScene().name != "GameScene") return;
+        //if (SceneManager.GetActiveScene().name != "GameScene") return;
 
-        if (!_view.IsMine) return;
+        //if (!_view.IsMine) return;
 
-        var _isImposter = false;
+        //var _isImposter = false;
 
-        if (_view.Controller.CustomProperties.ContainsKey("isImposter"))
-        {
-            _isImposter = (bool)PhotonNetwork.LocalPlayer.CustomProperties["isImposter"];
-        }
+        //if (_view.Controller.CustomProperties.ContainsKey("isImposter"))
+        //{
+        //    _isImposter = (bool)PhotonNetwork.LocalPlayer.CustomProperties["isImposter"];
+        //}
 
-        if (_isImposter)
-        {
-            var _killZone = Instantiate(KillZone, transform);
+        //if (_isImposter)
+        //{
+        //    var _killZone = Instantiate(KillZone, transform);
 
-            _killZone.GetComponent<KillZoneController>().KillButton = KillButton;
-            _killZone.GetComponent<KillZoneController>().VentButton = VentButton;
-        }
-        else
-        {
-            KillButton.gameObject.SetActive(false);
-            VentButton.gameObject.SetActive(false);
-        }
+        //    _killZone.GetComponent<KillZoneController>().KillButton = KillButton;
+        //    _killZone.GetComponent<KillZoneController>().VentButton = VentButton;
+        //}
+        //else
+        //{
+        //    KillButton.gameObject.SetActive(false);
+        //    VentButton.gameObject.SetActive(false);
+        //}
 
     }
 

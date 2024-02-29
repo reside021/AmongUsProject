@@ -6,14 +6,18 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class KillZoneController : MonoBehaviour
+public class ZoneController : MonoBehaviour
 {
     private GameObject _targetForKill;
     private GameObject _targetForVent;
     private Button _killBtn;
     private Button _ventBtn;
+    private Button _useBtn;
+    private Button _reportBtn;
+    private Button _sabotageBtn;
     private LayerMask _ventLayer;
     private LayerMask _attackLayer;
+    private bool _isImposter;
 
     private bool _isInVent
     {
@@ -42,14 +46,30 @@ public class KillZoneController : MonoBehaviour
     {
         get { return _killBtn; }
         set { _killBtn = value; }
-
     }
 
     public Button VentButton
     {
         get { return _ventBtn; }
         set { _ventBtn = value; }
+    }
 
+    public Button UseButton
+    {
+        get { return _useBtn; }
+        set { _useBtn = value; }
+    }
+
+    public Button ReportButton
+    {
+        get { return _reportBtn; }
+        set { _reportBtn = value; }
+    }
+
+    public Button SabotageButton
+    {
+        get { return _sabotageBtn; }
+        set { _sabotageBtn = value; }
     }
 
 
@@ -70,10 +90,37 @@ public class KillZoneController : MonoBehaviour
         KillButton.interactable = false;
         VentButton.onClick.AddListener(InteractWithVent);
         VentButton.interactable = false;
+        UseButton.onClick.AddListener(Use);
+        UseButton.interactable = false;
+        ReportButton.onClick.AddListener(Report);
+        ReportButton.interactable = false;
+        SabotageButton.onClick.AddListener(Sabotage);
+        SabotageButton.interactable = false;
 
         _ventLayer = LayerMask.NameToLayer("VentZone");
         _attackLayer = LayerMask.NameToLayer("AttackZone");
+        _isImposter = (bool)PhotonNetwork.LocalPlayer.CustomProperties["isImposter"];
 
+        VentButton.gameObject.SetActive(false);
+        SabotageButton.gameObject.SetActive(false);
+
+        if (!_isImposter)
+        {
+            KillButton.gameObject.SetActive(false);
+        }
+
+    }
+
+    private void Sabotage()
+    {
+    }
+
+    private void Use()
+    {
+    }
+
+    private void Report()
+    {
     }
 
     private void Kill()
@@ -165,6 +212,8 @@ public class KillZoneController : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D other)
     {
+        if (!_isImposter) return;
+
         if (other.CompareTag("Vent"))
         {
             if (_targetForVent == null)
@@ -172,6 +221,8 @@ public class KillZoneController : MonoBehaviour
                 _targetForVent = other.gameObject;
 
                 other.gameObject.GetComponent<SpriteRenderer>().material = OutlineVentMat;
+                UseButton.gameObject.SetActive(false);
+                VentButton.gameObject.SetActive(true);
                 VentButton.interactable = true;
             }
         }
@@ -199,11 +250,16 @@ public class KillZoneController : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D other)
     {
+
+        if (!_isImposter) return;
+
         if (other.CompareTag("Vent"))
         {
             other.gameObject.GetComponent<SpriteRenderer>().material = VentMat;
             _targetForVent = null;
             VentButton.interactable = false;
+            VentButton.gameObject.SetActive(false);
+            UseButton.gameObject.SetActive(true);
         }
 
         if (other.CompareTag("Player"))

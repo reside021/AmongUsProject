@@ -4,9 +4,9 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - AttackZone
   - Dead Body
   - Vent
+  - ActionZone
   layers:
   - Default
   - TransparentFX

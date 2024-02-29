@@ -17,10 +17,13 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public Button BackButton;
     public Button KillButton;
     public Button VentButton;
+    public Button UseButton;
+    public Button ReportButton;
+    public Button SabotageButton;
     public Camera Camera;
     public Transform DeathPanel;
     public GameObject KillScene;
-
+    public GameObject Zone;
 
     private GameObject _player;
 
@@ -34,13 +37,17 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         if (!PhotonNetwork.InRoom) return;
 
         _player = PhotonNetwork.Instantiate(PlayerPrefab.name, pos, Quaternion.identity);
-
-        _player.GetComponent<PlayerController>().KillButton = KillButton;
-        _player.GetComponent<PlayerController>().VentButton = VentButton;
         _player.GetComponent<PlayerController>().Camera = Camera;
 
         var virtualCamera = Cinemachine.GetComponent<CinemachineVirtualCamera>();
         virtualCamera.Follow = _player.transform;
+
+        var zone = Instantiate(Zone, _player.transform);
+        zone.GetComponent<ZoneController>().KillButton = KillButton;
+        zone.GetComponent<ZoneController>().VentButton = VentButton;
+        zone.GetComponent<ZoneController>().UseButton = UseButton;
+        zone.GetComponent<ZoneController>().ReportButton = ReportButton;
+        zone.GetComponent<ZoneController>().SabotageButton = SabotageButton;
 
     }
 
