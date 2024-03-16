@@ -24,9 +24,14 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public Transform DeathPanel;
     public GameObject KillScene;
     public GameObject Zone;
+    public GameObject DeadBodyReported;
+    public Animator VotingUIAnimator;
+    public Animator DeadBodyRepAnimator;
 
     private GameObject _player;
 
+
+    public static Action<int> OnTabletOpened;
 
     void Start()
     {
@@ -80,34 +85,51 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         if (photonEvent.Code == 99)
         {
-            var killerActor = (int)photonEvent.CustomData;
+            var killerID = (int)photonEvent.CustomData;
 
-            DisplayDeathScreen(killerActor);
+            StartCoroutine(DisplayDeathScreen(killerID));
             _player.GetComponent<PlayerController>().IsDead = true;
+        }
+        if (photonEvent.Code == 100)
+        {
+            var data = photonEvent.CustomData as Dictionary<string, int>;
+            var finderID = data["finderID"];
+            var murderedID = data["murderedID"];
+
+            OnTabletOpened?.Invoke(finderID);
+
+
+
+            StartCoroutine(DisplayBeforeVoting());
         }
     }
 
-
-    private void DisplayDeathScreen(int killerID)
+    IEnumerator DisplayBeforeVoting()
     {
-        DeathPanel.gameObject.SetActive(true);
-
-        var objects = GameObject.FindGameObjectsWithTag("Player");
-
-        var gameObject = objects.First(x => x.GetComponent<PhotonView>().ViewID == killerID);
-
-        StartCoroutine(DisplayDeathAnimation());
+        DeadBodyReported.SetActive(true);
+        var lenghAnimReported = DeadBodyRepAnimator.GetCurrentAnimatorStateInfo(0).length;
+        DeadBodyRepAnimator.Play(0);
+        yield return new WaitForSeconds(lenghAnimReported);
+        DeadBodyReported.SetActive(false);
+        VotingUIAnimator.SetTrigger("OpenVotingUI");
     }
 
-    IEnumerator DisplayDeathAnimation()
+    IEnumerator DisplayDeathScreen(int killerActNum)
     {
+        //var objects = GameObject.FindGameObjectsWithTag("Player");
+        //var gameObject = objects.First(x => x.GetComponent<PhotonView>().ViewID == killerID);
+
+        DeathPanel.gameObject.SetActive(true);
+
         var killScene = Instantiate(KillScene, DeathPanel);
         var animator = killScene.GetComponent<Animator>();
         animator.SetBool("KillAlien", true);
-        var lengthAnim = animator.GetCurrentAnimatorClipInfo(0)[0].clip.length;
+
+        var lengthAnim = animator.GetCurrentAnimatorStateInfo(0).length;
 
         yield return new WaitForSeconds(lengthAnim);
         animator.SetBool("KillAlien", false);
+
         DeathPanel.gameObject.SetActive(false);
     }
 }

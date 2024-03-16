@@ -1,17 +1,15 @@
+using ExitGames.Client.Photon;
 using Photon.Pun;
+using Photon.Realtime;
 using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour, IPunObservable
 {
-
     private MoveState _moveState = MoveState.Idle;
     private Rigidbody2D _rb;
-    private Collider2D _collider;
     private Animator _animatorController;
     private SpriteRenderer _spriteRenderer;
     private PhotonView _view;
@@ -56,7 +54,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             if (_isInVent != value)
             {
                 _isInVent = value;
-                Vent();
+                ChangeVentState();
             }
 
         }
@@ -72,7 +70,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
     void Start()
     {
         _rb = GetComponent<Rigidbody2D>();
-        _collider = GetComponent<CapsuleCollider2D>();
         _animatorController = GetComponent<Animator>();
         _view = GetComponent<PhotonView>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
@@ -82,31 +79,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
         NickNameText.text = _view.Owner.NickName;
 
-        StartSpawnAnim();
-
-        //if (SceneManager.GetActiveScene().name != "GameScene") return;
-
-        //if (!_view.IsMine) return;
-
-        //var _isImposter = false;
-
-        //if (_view.Controller.CustomProperties.ContainsKey("isImposter"))
-        //{
-        //    _isImposter = (bool)PhotonNetwork.LocalPlayer.CustomProperties["isImposter"];
-        //}
-
-        //if (_isImposter)
-        //{
-        //    var _killZone = Instantiate(KillZone, transform);
-
-        //    _killZone.GetComponent<KillZoneController>().KillButton = KillButton;
-        //    _killZone.GetComponent<KillZoneController>().VentButton = VentButton;
-        //}
-        //else
-        //{
-        //    KillButton.gameObject.SetActive(false);
-        //    VentButton.gameObject.SetActive(false);
-        //}
+        BeginSpawnAnim();
 
     }
 
@@ -162,17 +135,17 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
     }
 
-    private void StartSpawnAnim()
+    private void BeginSpawnAnim()
     {
         _isAnimSpawn = true;
         _spriteRenderer.flipX = !IsRightPlayer;
         _animatorController.SetBool("Spawn", true);
 
         var lengthAnim = _animatorController.GetCurrentAnimatorClipInfo(0)[0].clip.length;
-        StartCoroutine(StopSpawnAnim(lengthAnim));
+        StartCoroutine(EndSpawnAnim(lengthAnim));
     }
 
-    IEnumerator StopSpawnAnim(float time)
+    IEnumerator EndSpawnAnim(float time)
     {
         yield return new WaitForSeconds(time);
 
@@ -191,25 +164,26 @@ public class PlayerController : MonoBehaviour, IPunObservable
         _animatorController.SetBool("Dead", true);
 
         var lengthAnim = _animatorController.GetCurrentAnimatorClipInfo(0)[0].clip.length;
-        StartCoroutine(CreateDeadBodyCoroutine(lengthAnim));
+        StartCoroutine(TranslateToGhostCoroutine(lengthAnim));
 
     }
 
 
-    IEnumerator CreateDeadBodyCoroutine(float time)
+    IEnumerator TranslateToGhostCoroutine(float time)
     {
         yield return new WaitForSeconds(time);
 
-        ChangeVisiblePlayer();
+        EnableGhostVisible();
 
-        Instantiate(DeadBodyPrefab, transform.position, Quaternion.identity);
+        var deadBody = Instantiate(DeadBodyPrefab, transform.position, Quaternion.identity);
+        deadBody.GetComponent<DeadBodyId>().ID = _view.ViewID;
 
         _isAnimOfDeath = false;
 
         _animatorController.SetBool("Ghosting", true);
     }
 
-    private void ChangeVisiblePlayer()
+    private void EnableGhostVisible()
     {
         if (_view.IsMine)
         {
@@ -218,7 +192,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         ChangePlayerLayer(_ghostPlayerLayer);
     }
 
-    private void Vent()
+    private void ChangeVentState()
     {
         if (_isInVent)
         {

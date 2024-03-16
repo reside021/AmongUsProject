@@ -4,9 +4,9 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Dead Body
   - Vent
   - ActionZone
+  - DeadBody
   layers:
   - Default
   - TransparentFX
@@ -46,4 +46,7 @@ TagManager:
     locked: 0
   - name: Players
     uniqueID: 827883427
+    locked: 0
+  - name: UI
+    uniqueID: 2095779233
     locked: 0

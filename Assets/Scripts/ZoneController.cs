@@ -3,6 +3,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,6 +11,7 @@ public class ZoneController : MonoBehaviour
 {
     private GameObject _targetForKill;
     private GameObject _targetForVent;
+    private GameObject _targetForDeadBody;
     private Button _killBtn;
     private Button _ventBtn;
     private Button _useBtn;
@@ -38,9 +40,6 @@ public class ZoneController : MonoBehaviour
     public Material VentMat;
     public Material OutlineVentMat;
 
-
-    public static Action OnMoveInVent;
-    public static Action OnMoveOutVent;
 
     public Button KillButton
     {
@@ -121,20 +120,33 @@ public class ZoneController : MonoBehaviour
 
     private void Report()
     {
+        var finderID = transform.parent.GetComponent<PhotonView>().ViewID;
+        var murderedID = _targetForDeadBody.GetComponent<DeadBodyId>().ID;
+
+        var data = new Dictionary<string, int>
+        {
+            { "finderID", finderID },
+            { "murderedID", murderedID },
+        };
+
+        var options = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+        var sendOptions = new SendOptions { Reliability = true };
+        PhotonNetwork.RaiseEvent(100, data, options, sendOptions);
     }
 
     private void Kill()
     {
         if (_targetForKill == null) return;
 
-        var targetActor = _targetForKill.GetComponent<PhotonView>().OwnerActorNr;
+        var targetID = _targetForKill.GetComponent<PhotonView>().ControllerActorNr;
         var killerID = transform.parent.GetComponent<PhotonView>().ViewID;
 
-        var options = new RaiseEventOptions { TargetActors = new int[] { targetActor } };
+        var options = new RaiseEventOptions { TargetActors = new int[] { targetID } };
         var sendOptions = new SendOptions { Reliability = true };
         PhotonNetwork.RaiseEvent(99, killerID, options, sendOptions);
 
         _targetForKill.GetComponent<SpriteRenderer>().material = PlayerMat;
+        _targetForKill = null;
     }
 
     private void ChangeVents(Transform targetVents)
@@ -212,6 +224,16 @@ public class ZoneController : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D other)
     {
+        if (other.CompareTag("DeadBody"))
+        {
+            if (_targetForDeadBody == null)
+            {
+                _targetForDeadBody = other.gameObject;
+                ReportButton.interactable = true;
+            }
+        }
+
+
         if (!_isImposter) return;
 
         if (other.CompareTag("Vent"))
@@ -250,11 +272,18 @@ public class ZoneController : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D other)
     {
+        if (other.CompareTag("DeadBody"))
+        {
+            _targetForDeadBody = null;
+            ReportButton.interactable = false;
+        }
 
         if (!_isImposter) return;
 
         if (other.CompareTag("Vent"))
         {
+            if (_targetForVent == null) return;
+
             other.gameObject.GetComponent<SpriteRenderer>().material = VentMat;
             _targetForVent = null;
             VentButton.interactable = false;
@@ -264,6 +293,8 @@ public class ZoneController : MonoBehaviour
 
         if (other.CompareTag("Player"))
         {
+            if (_targetForKill == null) return;
+
             _targetForKill.GetComponent<SpriteRenderer>().material = PlayerMat;
             _targetForKill = null;
             KillButton.interactable = false;

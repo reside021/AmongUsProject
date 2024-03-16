@@ -74,7 +74,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
         else
         {
-
+            // TODO: Рандомизирвоать назнчаения импостером
             foreach (var player in PhotonNetwork.PlayerList)
             {
                 var isImposter = false;
@@ -151,8 +151,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     private void SendDataAboutState()
     {
-        RaiseEventOptions options = new RaiseEventOptions { Receivers = ReceiverGroup.All };
-        SendOptions sendOptions = new SendOptions { Reliability = true };
+        var options = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+        var sendOptions = new SendOptions { Reliability = true };
         PhotonNetwork.RaiseEvent(42, _readyStatePlayer, options, sendOptions);
     }
 
