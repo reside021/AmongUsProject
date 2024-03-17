@@ -306,7 +306,6 @@ namespace Photon.Realtime
             {
                 op[ParameterCode.Add] = opParams.ExpectedUsers;
             }
-
             if (opParams.OnGameServer)
             {
                 if (opParams.PlayerProperties != null && opParams.PlayerProperties.Count > 0)
@@ -373,7 +372,10 @@ namespace Photon.Realtime
                     op[ParameterCode.PlayerProperties] = opParams.PlayerProperties;
                 }
                 op[ParameterCode.Broadcast] = true; // broadcast actor properties
+            }
 
+            if (opParams.OnGameServer || opParams.JoinMode == JoinMode.CreateIfNotExists)
+            {
                 this.RoomOptionsToOpParameters(op, opParams.RoomOptions);
             }
 
@@ -494,8 +496,7 @@ namespace Photon.Realtime
                     opParameters[ParameterCode.RoomName] = createRoomParams.RoomName;
                 }
 
-                // this operation is always only done on the Master Server, so we skip sending props (commented out line below)
-                //this.RoomOptionsToOpParameters(opParameters, createRoomParams.RoomOptions, true);
+                this.RoomOptionsToOpParameters(opParameters, createRoomParams.RoomOptions, true);
             }
 
             //this.Listener.DebugReturn(DebugLevel.INFO, "OpJoinRandomOrCreateRoom: " + SupportClass.DictionaryToString(opParameters, false));
@@ -1200,11 +1201,8 @@ namespace Photon.Realtime
         public const int AuthenticationTicketExpired = 0x7FF1;
 
         /// <summary>
-        /// (32752) A server-side plugin or WebHook failed and reported an error. Check the OperationResponse.DebugMessage.
+        /// (32752) A server-side plugin (or webhook) failed to execute and reported an error. Check the OperationResponse.DebugMessage.
         /// </summary>
-        /// <remarks>A typical case is when a plugin prevents a user from creating or joining a room.
-        /// If this is prohibited, that reports to the client as a plugin error.<br/>
-        /// Same for WebHooks.</remarks>
         public const int PluginReportedError = 0x7FFF - 15;
 
         /// <summary>
@@ -1834,7 +1832,7 @@ namespace Photon.Realtime
         private bool isOpen = true;
 
         /// <summary>Max number of players that can be in the room at any time. 0 means "no limit".</summary>
-        public int MaxPlayers;
+        public byte MaxPlayers;
 
         /// <summary>Time To Live (TTL) for an 'actor' in a room. If a client disconnects, this actor is inactive first and removed after this timeout. In milliseconds.</summary>
         public int PlayerTtl;

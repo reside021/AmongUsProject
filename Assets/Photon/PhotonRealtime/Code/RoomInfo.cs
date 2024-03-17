@@ -9,7 +9,6 @@
 // <author>developer@photonengine.com</author>
 // ----------------------------------------------------------------------------
 
-
 #if UNITY_4_7 || UNITY_5 || UNITY_5_3_OR_NEWER
 #define SUPPORTED_UNITY
 #endif
@@ -17,7 +16,6 @@
 
 namespace Photon.Realtime
 {
-    using System;
     using System.Collections;
     using ExitGames.Client.Photon;
 
@@ -44,7 +42,7 @@ namespace Photon.Realtime
         private Hashtable customProperties = new Hashtable();
 
         /// <summary>Backing field for property.</summary>
-        protected int maxPlayers = 0;
+        protected byte maxPlayers = 0;
 
         /// <summary>Backing field for property.</summary>
         protected int emptyRoomTtl = 0;
@@ -97,7 +95,7 @@ namespace Photon.Realtime
         /// Count of players currently in room. This property is overwritten by the Room class (used when you're in a Room).
         /// </summary>
         public int PlayerCount { get; private set; }
-
+        
         /// <summary>
         /// The limit of players for this room. This property is shown in lobby, too.
         /// If the room is full (players count == maxplayers), joining this room will fail.
@@ -106,7 +104,7 @@ namespace Photon.Realtime
         /// As part of RoomInfo this can't be set.
         /// As part of a Room (which the player joined), the setter will update the server and all clients.
         /// </remarks>
-        public int MaxPlayers
+        public byte MaxPlayers
         {
             get
             {
@@ -220,7 +218,7 @@ namespace Photon.Realtime
             // fetch the "well known" properties of the room, if available
             if (propertiesToCache.ContainsKey(GamePropertyKey.MaxPlayers))
             {
-                this.maxPlayers = Convert.ToInt32(propertiesToCache[GamePropertyKey.MaxPlayers]);
+                this.maxPlayers = (byte)propertiesToCache[GamePropertyKey.MaxPlayers];
             }
 
             if (propertiesToCache.ContainsKey(GamePropertyKey.IsOpen))
@@ -235,7 +233,7 @@ namespace Photon.Realtime
 
             if (propertiesToCache.ContainsKey(GamePropertyKey.PlayerCount))
             {
-                this.PlayerCount = Convert.ToInt32(propertiesToCache[GamePropertyKey.PlayerCount]);
+                this.PlayerCount = (int)((byte)propertiesToCache[GamePropertyKey.PlayerCount]);
             }
 
             if (propertiesToCache.ContainsKey(GamePropertyKey.CleanupCacheOnLeave))

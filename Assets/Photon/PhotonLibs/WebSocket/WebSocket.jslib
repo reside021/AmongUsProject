@@ -76,7 +76,8 @@ SocketError: function (socketInstance, ptr, bufsize)
  	var socket = webSocketInstances[socketInstance];
  	if (socket.error == null)
  		return 0;
-    stringToUTF8(socket.error, ptr, bufsize);
+    var str = socket.error.slice(0, Math.max(0, bufsize - 1));
+    writeStringToMemory(str, ptr, false);
     return 1;
 },
 

@@ -271,7 +271,7 @@ namespace Photon.Chat
                 this.chatPeer.NameServerHost = appSettings.Server;
                 this.chatPeer.NameServerPortOverride = appSettings.Port;
             }
-
+            
             this.ProxyServerAddress = appSettings.ProxyServer;
 
             return this.Connect(appSettings.AppIdChat, appSettings.AppVersion, this.AuthValues);
