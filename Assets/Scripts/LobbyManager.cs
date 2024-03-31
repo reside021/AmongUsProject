@@ -21,7 +21,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public Animator LeftFireController;
     public Animator RightFireController;
 
-    private Dictionary<string, bool> _readyStatePlayer = new Dictionary<string, bool>();
+    private Dictionary<int, bool> _readyStatePlayer = new();
     private bool _isReady = false;
     private Dictionary<int, Vector3> positionForSpawn = new Dictionary<int, Vector3>()
     {
@@ -139,7 +139,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
     private void ReadyForGame()
     {
         _isReady = !_isReady;
-        _readyStatePlayer[PhotonNetwork.NickName] = _isReady;
+        _readyStatePlayer[PhotonNetwork.LocalPlayer.ActorNumber] = _isReady;
 
         if (_isReady)
             ReadyBtn.GetComponentInChildren<TextMeshProUGUI>().text = "Not Ready";
@@ -182,7 +182,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
         {
             StartGameBtn.gameObject.SetActive(true);
 
-            _readyStatePlayer.Remove(otherPlayer.NickName);
+            _readyStatePlayer.Remove(otherPlayer.ActorNumber);
             SendDataAboutState();
         }
     }
@@ -191,7 +191,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         if (photonEvent.Code == 42)
         {
-            var newReadyStatePlayer = photonEvent.CustomData as Dictionary<string, bool>;
+            var newReadyStatePlayer = photonEvent.CustomData as Dictionary<int, bool>;
             _readyStatePlayer = newReadyStatePlayer;
             SetCountPlayerText();
         }

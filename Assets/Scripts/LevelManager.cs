@@ -32,6 +32,7 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
 
     public static Action<int> OnTabletOpened;
+    public static Action<int, int> OnPlayerVoted;
 
     void Start()
     {
@@ -98,9 +99,15 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
             OnTabletOpened?.Invoke(finderID);
 
-
-
             StartCoroutine(DisplayBeforeVoting());
+        }
+        if (photonEvent.Code == 10)
+        {
+            var data = (int)photonEvent.CustomData;
+            var sender = photonEvent.Sender;
+
+            OnPlayerVoted?.Invoke(data, sender);
+            
         }
     }
 
@@ -114,7 +121,7 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         VotingUIAnimator.SetTrigger("OpenVotingUI");
     }
 
-    IEnumerator DisplayDeathScreen(int killerActNum)
+    IEnumerator DisplayDeathScreen(int killerID)
     {
         //var objects = GameObject.FindGameObjectsWithTag("Player");
         //var gameObject = objects.First(x => x.GetComponent<PhotonView>().ViewID == killerID);

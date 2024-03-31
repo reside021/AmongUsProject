@@ -6,6 +6,7 @@ using Photon.Pun;
 using ExitGames.Client.Photon;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class ChatManager : MonoBehaviour, IChatClientListener
 {
@@ -33,13 +34,22 @@ public class ChatManager : MonoBehaviour, IChatClientListener
         chatClient.Connect(appId, appVersion, new AuthenticationValues(userId));
 
         TextMessageInputField.onValueChanged.AddListener(TextMessageChanged);
+        TextMessageInputField.onEndEdit.AddListener(InputOnEndEdit);
 
         SendMessageBtn.onClick.AddListener(SendMessage);
     }
 
+    private void InputOnEndEdit(string inputString)
+    {
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            SendMessage();
+        }
+    }
+
     private void TextMessageChanged(string newText)
     {
-        CountCharacterText.text = newText.Length.ToString();
+        CountCharacterText.text = newText.Trim().Length.ToString();
     }
 
     private void SendMessage()
@@ -47,9 +57,11 @@ public class ChatManager : MonoBehaviour, IChatClientListener
         if (chatClient == null) return;
         if (string.IsNullOrEmpty(TextMessageInputField.text)) return;
 
-        chatClient.PublishMessage(CHANNEL, TextMessageInputField.text);
+        chatClient.PublishMessage(CHANNEL, TextMessageInputField.text.Trim());
 
         TextMessageInputField.text = string.Empty;
+
+        TextMessageInputField.ActivateInputField();
     }
 
     public void DebugReturn(DebugLevel level, string message)
