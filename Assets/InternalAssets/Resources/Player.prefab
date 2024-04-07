@@ -407,6 +407,7 @@ MonoBehaviour:
   VentArrow: {fileID: 0}
   DeadBodyPrefab: {fileID: 7105557607967098023, guid: 426b45c21492c284784394a3e9f96e49, type: 3}
   IsRightPlayer: 1
+  IsKicked: 0
 --- !u!95 &7136423246141579727
 Animator:
   serializedVersion: 5

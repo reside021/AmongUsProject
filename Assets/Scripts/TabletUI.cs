@@ -5,9 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class TabletUI : MonoBehaviour
@@ -21,9 +19,9 @@ public class TabletUI : MonoBehaviour
     public Button VoteConfirmBtn;
     public TextMeshProUGUI TimerText;
     public Transform Content;
-
-
     public Transform UsersBlock;
+
+    public static Action<int> OnKickPlayer;
 
     private int _playerCount = 0;
     private NonAllocDictionary<int, PhotonView>.ValueIterator _players = new NonAllocDictionary<int, PhotonView>.ValueIterator();
@@ -36,6 +34,8 @@ public class TabletUI : MonoBehaviour
     private int _votingEndsIn = 35;
     private int _proceedingIn = 5;
 
+    private int _deadPlayerCount = 0;
+    private int _votedPlayerCount = 0;
 
     private Dictionary<int, List<int>> _votingSheet = new();
 
@@ -157,75 +157,9 @@ public class TabletUI : MonoBehaviour
 
 
 
-    private void ShowVoteCount()
-    {
-        var index = -1;
+    
 
-        foreach (var player in _players)
-        {
-            if (!player.CompareTag("Player")) continue;
-
-            index++;
-
-            var currentVoted = _votingSheet[player.ControllerActorNr];
-
-            if (currentVoted.Count == 0) continue;
-
-            var blockVoted = _users[index].Find("Content/BlockVoted");
-
-            for (var i = 0; i < currentVoted.Count; i++)
-            {
-                blockVoted.GetChild(i).gameObject.SetActive(true);
-            }
-        }
-
-        var currentSkipped = _votingSheet[SKIP];
-
-        if (currentSkipped.Count != 0)
-        {
-            var blockSkipped = transform.Find("Panel/SkipVoting/BlockVoted");
-            Debug.Log(blockSkipped);
-            for (var i = 0; i < currentSkipped.Count; i++)
-            {
-                blockSkipped.GetChild(i).gameObject.SetActive(true);
-            }
-        }
-    }
-
-    private void ResetTablet()
-    {
-        for (var i = 0; i < _playerCount; i++)
-        {
-            var blockVoted = _users[i].Find("Content/BlockVoted");
-
-            for (var j = 0; j < blockVoted.childCount; j++)
-            {
-                blockVoted.GetChild(j).gameObject.SetActive(false);
-            }
-
-            _users[i].Find("Content/SignVoted").gameObject.SetActive(false);
-            _users[i].Find("Content/SignReported").gameObject.SetActive(false);
-            _users[i].Find("DeathPlayer").gameObject.SetActive(false);
-        }
-
-        var blockSkipped = transform.Find("Panel/SkipVoting/BlockVoted");
-        for (var i = 0; i < blockSkipped.childCount; i++)
-        {
-            blockSkipped.GetChild(i).gameObject.SetActive(false);
-        }
-
-        var msgInChat = new Transform[Content.childCount];
-
-        for (var i = 0; i < Content.childCount; i++)
-        {
-            msgInChat[i] = Content.GetChild(i);
-        }
-
-        for (var i = 0; i < msgInChat.Length; i++)
-        {
-            DestroyImmediate(msgInChat[i].gameObject);
-        }
-    }
+    
 
     #region CallbackMethods
 
@@ -265,6 +199,7 @@ public class TabletUI : MonoBehaviour
             if (playerDead)
             {
                 _users[index].Find("DeathPlayer").gameObject.SetActive(true);
+                _deadPlayerCount++;
             }
 
             if (_isMineDead) continue;
@@ -335,6 +270,11 @@ public class TabletUI : MonoBehaviour
             TimerText.text = $"Voting Ends In: {currentTime}s";
             currentTime--;
             yield return new WaitForSeconds(1);
+
+            if (_playerCount == _deadPlayerCount + _votedPlayerCount)
+            {
+                break;
+            }
         }
 
         _isTimeForVote = false;
@@ -343,6 +283,10 @@ public class TabletUI : MonoBehaviour
     private IEnumerator TimerProceeding()
     {
         ShowVoteCount();
+
+        var actNumForKick = GetPlayerForKick();
+
+
 
         var currentTime = _proceedingIn;
 
@@ -353,16 +297,121 @@ public class TabletUI : MonoBehaviour
             yield return new WaitForSeconds(1);
         }
 
+        OnKickPlayer?.Invoke(actNumForKick);
+
+        this.transform.parent.GetComponent<Animator>().SetTrigger("CloseVotingUI");
+
         ResetTablet();
     }
 
     #endregion
+
+    private void ShowVoteCount()
+    {
+        var index = -1;
+
+        foreach (var player in _players)
+        {
+            if (!player.CompareTag("Player")) continue;
+
+            index++;
+
+            var currentVoted = _votingSheet[player.ControllerActorNr];
+
+            if (currentVoted.Count == 0) continue;
+
+            var blockVoted = _users[index].Find("Content/BlockVoted");
+
+            for (var i = 0; i < currentVoted.Count; i++)
+            {
+                blockVoted.GetChild(i).gameObject.SetActive(true);
+            }
+        }
+
+        var currentSkipped = _votingSheet[SKIP];
+
+        if (currentSkipped.Count != 0)
+        {
+            var blockSkipped = transform.Find("Panel/SkipVoting/BlockVoted");
+            for (var i = 0; i < currentSkipped.Count; i++)
+            {
+                blockSkipped.GetChild(i).gameObject.SetActive(true);
+            }
+        }
+    }
+
+    private int GetPlayerForKick()
+    {
+        var listVoted = _votingSheet[SKIP];
+        var actNum = -1;
+
+        foreach (var el in _votingSheet)
+        {
+
+            if (el.Value.Count == listVoted.Count)
+            {
+                actNum = -1;
+            }
+
+            if (el.Value.Count > listVoted.Count)
+            {
+                listVoted = el.Value;
+                actNum = el.Key;
+            }
+        }
+
+        if (listVoted.Count < (_playerCount - _deadPlayerCount) / 2)
+        {
+            actNum = -1;
+        }
+
+        return actNum;
+    }
+
+
+    private void ResetTablet()
+    {
+        for (var i = 0; i < _playerCount; i++)
+        {
+            var blockVoted = _users[i].Find("Content/BlockVoted");
+
+            for (var j = 0; j < blockVoted.childCount; j++)
+            {
+                blockVoted.GetChild(j).gameObject.SetActive(false);
+            }
+
+            _users[i].Find("Content/SignVoted").gameObject.SetActive(false);
+            _users[i].Find("Content/SignReported").gameObject.SetActive(false);
+            _users[i].Find("DeathPlayer").gameObject.SetActive(false);
+        }
+
+        var blockSkipped = transform.Find("Panel/SkipVoting/BlockVoted");
+        for (var i = 0; i < blockSkipped.childCount; i++)
+        {
+            blockSkipped.GetChild(i).gameObject.SetActive(false);
+        }
+
+        var msgInChat = new Transform[Content.childCount];
+
+        for (var i = 0; i < Content.childCount; i++)
+        {
+            msgInChat[i] = Content.GetChild(i);
+        }
+
+        for (var i = 0; i < msgInChat.Length; i++)
+        {
+            DestroyImmediate(msgInChat[i].gameObject);
+        }
+    }
 
 
     #region Callback
 
     private void OnTabletOpened(int finderID)
     {
+        _deadPlayerCount = 0;
+        _votedPlayerCount = 0;
+
         _isVoted = false;
 
         CheckStatusMineDead();
@@ -375,6 +424,7 @@ public class TabletUI : MonoBehaviour
     {
         _votingSheet[actorKicked].Add(actorSender);
         UpdateVotedPlayer(actorSender);
+        _votedPlayerCount++;
     }
 
     #endregion

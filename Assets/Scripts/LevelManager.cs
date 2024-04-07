@@ -27,15 +27,33 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public GameObject DeadBodyReported;
     public Animator VotingUIAnimator;
     public Animator DeadBodyRepAnimator;
+    [SerializeField] private GameObject Kick;
 
     private GameObject _player;
+
+    private List<int> _impostors = new();
 
 
     public static Action<int> OnTabletOpened;
     public static Action<int, int> OnPlayerVoted;
+    public static Action<string, string> OnVoteEnds;
+    public static Action OnOpenUI;
+
+
+    private void OnEnable()
+    {
+        base.OnEnable();
+        TabletUI.OnKickPlayer += OnKickPlayer;
+    }
+
 
     void Start()
     {
+        foreach (var el in PhotonNetwork.PlayerList)
+        {
+            Debug.Log($"{el.ActorNumber} - {el.NickName}");
+        }
+
         AddListenersForButton();
 
         var pos = new Vector2(UnityEngine.Random.Range(-2, 2), UnityEngine.Random.Range(-3, 3));
@@ -84,6 +102,10 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     public void OnEvent(EventData photonEvent)
     {
+        if (photonEvent.Code == 98)
+        {
+            _impostors.Add(photonEvent.Sender);
+        }
         if (photonEvent.Code == 99)
         {
             var killerID = (int)photonEvent.CustomData;
@@ -96,9 +118,9 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
             var data = photonEvent.CustomData as Dictionary<string, int>;
             var finderID = data["finderID"];
             var murderedID = data["murderedID"];
-
+            OnOpenUI?.Invoke();
             OnTabletOpened?.Invoke(finderID);
-
+            DeadBodyDestroy(murderedID);
             StartCoroutine(DisplayBeforeVoting());
         }
         if (photonEvent.Code == 10)
@@ -138,5 +160,74 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         animator.SetBool("KillAlien", false);
 
         DeathPanel.gameObject.SetActive(false);
+    }
+
+
+    private void OnKickPlayer(int actNum)
+    {
+        var resultText = string.Empty;
+        if (actNum == -1)
+        {
+            resultText = "No one was ejected";
+        } 
+        else
+        {
+            var nickName = PhotonNetwork.PlayerList.ToList().Find(x => x.ActorNumber == actNum).NickName;
+
+            if (_impostors.Contains(actNum))
+            {
+                resultText = $"{nickName} was The Impostor";
+            }
+            else
+            {
+                resultText = $"{nickName} was not The Impostor";
+            }
+        }
+
+        foreach (var view in PhotonNetwork.PhotonViewCollection)
+        {
+            if (!view.CompareTag("Player")) continue;
+
+            if (view.ControllerActorNr == actNum)
+            {
+                view.GetComponent<PlayerController>().IsKicked = true;
+                view.GetComponent<PlayerController>().IsDead = true;
+
+                _impostors.Remove(actNum);
+            }
+        }
+
+        var remainsText = $"{_impostors.Count} Impostor remains.";
+
+        Kick.SetActive(true);
+
+        OnVoteEnds?.Invoke(resultText, remainsText);
+
+    }
+
+
+    private void DeadBodyDestroy(int id)
+    {
+        var deads = GameObject.FindGameObjectsWithTag("DeadBody");
+
+        GameObject objForDestroy = null;
+
+        foreach (var dead in deads)
+        {
+            if (dead.GetComponent<DeadBodyId>().ID == id)
+            {
+                objForDestroy = dead;
+            }
+        }
+
+        if (objForDestroy != null)
+        {
+            Destroy(objForDestroy);
+        }
+    }
+
+    private void OnDisable()
+    {
+        TabletUI.OnKickPlayer -= OnKickPlayer;
     }
 }

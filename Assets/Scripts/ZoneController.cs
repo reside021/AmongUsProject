@@ -106,6 +106,11 @@ public class ZoneController : MonoBehaviour
         if (!_isImposter)
         {
             KillButton.gameObject.SetActive(false);
+        } else
+        {
+            var options = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+            var sendOptions = new SendOptions { Reliability = true };
+            PhotonNetwork.RaiseEvent(98, true, options, sendOptions);
         }
 
     }
