@@ -14,7 +14,6 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
 {
     public GameObject PlayerPrefab;
     public GameObject Cinemachine;
-    public Button BackButton;
     public Button KillButton;
     public Button VentButton;
     public Button UseButton;
@@ -28,10 +27,23 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public Animator VotingUIAnimator;
     public Animator DeadBodyRepAnimator;
     [SerializeField] private GameObject Kick;
+    [SerializeField] private Transform PlayerOnMap;
+    [SerializeField] private Transform ZeroPointGlobal;
+    [SerializeField] private Transform ZeroPointMap;
 
     private GameObject _player;
+    private float _coefForMap = 12.0f;
 
     private List<int> _impostors = new();
+
+
+    private Dictionary<int, float[]> positionForSpawn = new ()
+    {
+        { 0, new float[4] { -4.25f, 4.0f, 2.2f, 9.7f }},
+        { 1, new float[4] { -14.35f, -4.6f, -6.3f, 3.5f }},
+        { 2, new float[4] { 4.7f, -4.5f, 12.0f, 3.9f }},
+        { 3, new float[4] { -4.0f, -11.0f, 1.8f, -4.7f }},
+    };
 
 
     public static Action<int> OnTabletOpened;
@@ -49,14 +61,8 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     void Start()
     {
-        foreach (var el in PhotonNetwork.PlayerList)
-        {
-            Debug.Log($"{el.ActorNumber} - {el.NickName}");
-        }
 
-        AddListenersForButton();
-
-        var pos = new Vector2(UnityEngine.Random.Range(-2, 2), UnityEngine.Random.Range(-3, 3));
+        var pos = GetPosSpawn();
 
         if (!PhotonNetwork.InRoom) return;
 
@@ -75,14 +81,31 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     }
 
-    private void AddListenersForButton()
+    private Vector2 GetPosSpawn()
     {
-        BackButton.onClick.AddListener(Leave);
+        var index = UnityEngine.Random.Range(0, positionForSpawn.Count - 1);
+
+
+        var x = UnityEngine.Random.Range(positionForSpawn[index][0], positionForSpawn[index][2]);
+        var y = UnityEngine.Random.Range(positionForSpawn[index][1], positionForSpawn[index][3]);
+
+        return new Vector2(x, y);
     }
 
-    public void Leave()
+
+    void Update()
     {
-        PhotonNetwork.LeaveRoom();
+        if (_player != null)
+        {
+            var diffGlobal = _player.transform.position - ZeroPointGlobal.position;
+
+            //Debug.Log($"diffGlobal - {diffGlobal}");
+            //Debug.Log($"zeroposmap - {ZeroPointMap.position}");
+            var diffMap = ZeroPointMap.localPosition + diffGlobal * _coefForMap;
+            Debug.Log($"diffMap - {diffMap}");
+
+            PlayerOnMap.transform.localPosition = diffMap;
+        }
     }
     public override void OnLeftRoom()
     {

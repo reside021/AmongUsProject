@@ -1,20 +1,28 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameUI : MonoBehaviour
 {
-    public Button backBtn;
-    void Start()
+    [SerializeField] private Button SettingsBtn;
+    [SerializeField] private Button MapBtn;
+
+    [SerializeField] private GameObject Map;
+    [SerializeField] private GameObject Settings;
+
+    private void Start()
     {
-        backBtn.onClick.AddListener(BackToScene);
+        SettingsBtn.onClick.AddListener(OpenSettings);
+        MapBtn.onClick.AddListener(OpenMap);
     }
 
-    private void BackToScene()
+    private void OpenSettings()
     {
-        SceneManager.LoadScene(1);
+        Settings.SetActive(true);
     }
+
+    private void OpenMap()
+    {
+        Map.SetActive(true);
+    }
+
 }
