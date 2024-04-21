@@ -154,6 +154,14 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
             OnPlayerVoted?.Invoke(data, sender);
             
         }
+        if (photonEvent.Code == 51)
+        {
+            var data = (int)photonEvent.CustomData;
+            var sender = photonEvent.Sender;
+
+            
+
+        }
     }
 
     IEnumerator DisplayBeforeVoting()
