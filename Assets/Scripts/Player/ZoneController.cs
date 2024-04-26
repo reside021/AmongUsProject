@@ -1,6 +1,7 @@
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using Photon.Realtime;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -34,10 +35,12 @@ public class ZoneController : MonoBehaviour
     }
 
 
-    public Material PlayerMat;
-    public Material OutlinePlayerMat;
-    public Material VentMat;
-    public Material OutlineVentMat;
+    [SerializeField] private Material PlayerMat;
+    [SerializeField] private Material OutlinePlayerMat;
+    [SerializeField] private Material VentMat;
+    [SerializeField] private Material OutlineVentMat;
+    [SerializeField] private Material TaskElectricity;
+    [SerializeField] private Material OutlineTaskElectricity;
 
 
     public Button KillButton
@@ -70,15 +73,12 @@ public class ZoneController : MonoBehaviour
         set { _sabotageBtn = value; }
     }
 
+    public static Action OnTaskUsed;
+
 
     private void OnEnable()
     {
         VentsManager.ChangeVents += ChangeVents;
-    }
-
-    private void OnDisable()
-    {
-        VentsManager.ChangeVents -= ChangeVents;
     }
 
     void Start()
@@ -120,6 +120,7 @@ public class ZoneController : MonoBehaviour
 
     private void Use()
     {
+        OnTaskUsed?.Invoke();
     }
 
     private void Report()
@@ -237,6 +238,12 @@ public class ZoneController : MonoBehaviour
             }
         }
 
+        if (other.CompareTag("Task"))
+        {
+            other.gameObject.GetComponent<SpriteRenderer>().material = OutlineTaskElectricity;
+            UseButton.interactable = true;
+        }
+
 
         if (!_isImposter) return;
 
@@ -282,6 +289,12 @@ public class ZoneController : MonoBehaviour
             ReportButton.interactable = false;
         }
 
+        if (other.CompareTag("Task"))
+        {
+            other.gameObject.GetComponent<SpriteRenderer>().material = TaskElectricity;
+            UseButton.interactable = false;
+        }
+
         if (!_isImposter) return;
 
         if (other.CompareTag("Vent"))
@@ -303,5 +316,13 @@ public class ZoneController : MonoBehaviour
             _targetForKill = null;
             KillButton.interactable = false;
         }
+
+    }
+
+
+
+    private void OnDisable()
+    {
+        VentsManager.ChangeVents -= ChangeVents;
     }
 }

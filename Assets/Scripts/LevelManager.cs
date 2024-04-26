@@ -9,28 +9,33 @@ using UnityEngine.UI;
 using System.Linq;
 using ExitGames.Client.Photon;
 using System.Collections.Generic;
+using TMPro;
 
 public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
 {
-    public GameObject PlayerPrefab;
-    public GameObject Cinemachine;
-    public Button KillButton;
-    public Button VentButton;
-    public Button UseButton;
-    public Button ReportButton;
-    public Button SabotageButton;
-    public Camera Camera;
-    public Transform DeathPanel;
-    public GameObject KillScene;
-    public GameObject Zone;
-    public GameObject DeadBodyReported;
-    public Animator VotingUIAnimator;
-    public Animator DeadBodyRepAnimator;
+    [SerializeField] private GameObject PlayerPrefab;
+    [SerializeField] private GameObject Cinemachine;
+    [SerializeField] private Button KillButton;
+    [SerializeField] private Button VentButton;
+    [SerializeField] private Button UseButton;
+    [SerializeField] private Button ReportButton;
+    [SerializeField] private Button SabotageButton;
+    [SerializeField] private Camera Camera;
+    [SerializeField] private Transform DeathPanel;
+    [SerializeField] private GameObject KillScene;
+    [SerializeField] private GameObject Zone;
+    [SerializeField] private GameObject DeadBodyReported;
+    [SerializeField] private Animator VotingUIAnimator;
+    [SerializeField] private Animator DeadBodyRepAnimator;
     [SerializeField] private GameObject Kick;
     [SerializeField] private Transform PlayerOnMap;
     [SerializeField] private Transform ZeroPointGlobal;
     [SerializeField] private Transform ZeroPointMap;
+    [SerializeField] private Transform Tasks;
+    [SerializeField] private TextMeshProUGUI TaskCount;
 
+    private int _maxTasks = 10;
+    private int _currentTask = 0;
     private GameObject _player;
     private float _coefForMap = 12.0f;
 
@@ -56,6 +61,7 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         base.OnEnable();
         TabletUI.OnKickPlayer += OnKickPlayer;
+        ZoneController.OnTaskUsed += OnTaskUsed;
     }
 
 
@@ -98,11 +104,7 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         if (_player != null)
         {
             var diffGlobal = _player.transform.position - ZeroPointGlobal.position;
-
-            //Debug.Log($"diffGlobal - {diffGlobal}");
-            //Debug.Log($"zeroposmap - {ZeroPointMap.position}");
             var diffMap = ZeroPointMap.localPosition + diffGlobal * _coefForMap;
-            Debug.Log($"diffMap - {diffMap}");
 
             PlayerOnMap.transform.localPosition = diffMap;
         }
@@ -159,7 +161,9 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
             var data = (int)photonEvent.CustomData;
             var sender = photonEvent.Sender;
 
-            
+
+            _currentTask++;
+            TaskCount.text = $"{_currentTask}/{TaskCount}";
 
         }
     }
@@ -257,8 +261,21 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
     }
 
+
+    private void OnTaskUsed()
+    {
+        var taskCount = Tasks.childCount;
+
+        int indexTask = UnityEngine.Random.Range(0, taskCount + 1);
+
+        var task = Tasks.GetChild(indexTask);
+
+        task.gameObject.SetActive(true);
+    }
+
     private void OnDisable()
     {
         TabletUI.OnKickPlayer -= OnKickPlayer;
+        ZoneController.OnTaskUsed -= OnTaskUsed;
     }
 }
