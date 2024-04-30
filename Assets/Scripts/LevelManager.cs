@@ -33,8 +33,11 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     [SerializeField] private Transform ZeroPointMap;
     [SerializeField] private Transform Tasks;
     [SerializeField] private TextMeshProUGUI TaskCount;
+    [SerializeField] private TextMeshProUGUI MainTextEndGame;
+    [SerializeField] private TextMeshProUGUI SecondTextEndGame;
+    [SerializeField] private GameObject PanelEndGame;
 
-    private int _maxTasks = 10;
+    private int _maxTasks = 1;
     private int _currentTask = 0;
     private GameObject _player;
     private float _coefForMap = 12.0f;
@@ -85,6 +88,7 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         zone.GetComponent<ZoneController>().ReportButton = ReportButton;
         zone.GetComponent<ZoneController>().SabotageButton = SabotageButton;
 
+        TaskCount.text = $"{_currentTask}/{_maxTasks}";
     }
 
     private Vector2 GetPosSpawn()
@@ -158,14 +162,45 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
         if (photonEvent.Code == 51)
         {
-            var data = (int)photonEvent.CustomData;
+            var data = photonEvent.CustomData as Dictionary<string, string>;
             var sender = photonEvent.Sender;
 
 
             _currentTask++;
-            TaskCount.text = $"{_currentTask}/{TaskCount}";
+            TaskCount.text = $"{_currentTask}/{_maxTasks}";
+
+            if (_currentTask >= _maxTasks)
+            {
+                StartEndGame();
+            }
 
         }
+    }
+
+    private void StartEndGame()
+    {
+        if (_impostors.Contains(PhotonNetwork.LocalPlayer.ActorNumber))
+        {
+            MainTextEndGame.text = "Defeat";
+            SecondTextEndGame.text = "Completed Task";
+            SecondTextEndGame.color = Color.red;
+
+        } else
+        {
+            MainTextEndGame.text = "Victory";
+            SecondTextEndGame.text = "Completed Task";
+            SecondTextEndGame.color = Color.green;
+        }
+
+        PanelEndGame.SetActive(true);
+        StartCoroutine(ExitGame());
+    }
+
+    IEnumerator ExitGame()
+    {
+        yield return new WaitForSeconds(3);
+
+        PhotonNetwork.LeaveRoom();
     }
 
     IEnumerator DisplayBeforeVoting()
@@ -266,7 +301,7 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         var taskCount = Tasks.childCount;
 
-        int indexTask = UnityEngine.Random.Range(0, taskCount + 1);
+        int indexTask = UnityEngine.Random.Range(0, taskCount);
 
         var task = Tasks.GetChild(indexTask);
 

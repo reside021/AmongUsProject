@@ -6,10 +6,10 @@ using UnityEngine.UI;
 public class ElectricityButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
 {
     [SerializeField] private LineController _controller;
+    [SerializeField] private Camera Camera;
     private Vector3 _startPoint;
     private bool _onDown;
     private bool _connected;
-
 
     public static Action Progressed;
 
@@ -61,13 +61,12 @@ public class ElectricityButton : MonoBehaviour, IPointerDownHandler, IPointerUpH
     {
         if (_onDown)
         {
-            var currentPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
-            currentPos.x *= 1.1f;
+            var currentPos = Camera.ScreenToWorldPoint(Input.mousePosition);
 
             var points = new Vector3[] { _startPoint, currentPos };
 
             _controller.SetUpLine(points);
+
         }
     }
 

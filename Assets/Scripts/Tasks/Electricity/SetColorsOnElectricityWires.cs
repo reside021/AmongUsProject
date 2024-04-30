@@ -11,6 +11,7 @@ public class SetColorsElectricityWires : MonoBehaviour
 
     void Start()
     {
+        Debug.Log("START");
         SetColorsPoint(LeftPoints);
         SetColorsPoint(RightPoints);
     }

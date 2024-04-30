@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
@@ -81,12 +79,5 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public void ExitGame()
     {
         Application.Quit();
-    }
-
-    private void Log(string message)
-    {
-        Debug.Log(message);
-        LogText.text += "\n";
-        LogText.text += message;
     }
 }

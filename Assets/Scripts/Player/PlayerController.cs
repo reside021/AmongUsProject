@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     private LayerMask _playerLayer;
 
 
-    public float MoveSpeed = 10f;
+    public float MoveSpeed = 15f;
 
     public TextMeshProUGUI NickNameText;
 
