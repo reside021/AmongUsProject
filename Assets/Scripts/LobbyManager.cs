@@ -5,6 +5,7 @@ using Photon.Realtime;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -74,28 +75,41 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
         else
         {
-            // TODO: Рандомизирвоать назнчаения импостером
-            foreach (var player in PhotonNetwork.PlayerList)
+            if (PhotonNetwork.LocalPlayer.IsMasterClient)
             {
-                var isImposter = false;
+                var players = ShufflePlayers(PhotonNetwork.PlayerList);
 
-                if (player.IsMasterClient)
+                RaiseEventOptions options = new RaiseEventOptions();
+
+                if (players.Length < 6)
                 {
-                    isImposter = true;
+                    options.TargetActors = new int[] { players[0].ActorNumber };
                 }
                 else
                 {
-                    isImposter = false;
+                    options.TargetActors = new int[] { players[0].ActorNumber, players[1].ActorNumber };
                 }
 
-                var options = new RaiseEventOptions { TargetActors = new int[] { player.ActorNumber } };
                 var sendOptions = new SendOptions { Reliability = true };
-                PhotonNetwork.RaiseEvent(43, isImposter, options, sendOptions);
-
+                PhotonNetwork.RaiseEvent(43, true, options, sendOptions);
             }
-
+            
             StartGameBtn.interactable = true;
         }
+    }
+
+    private Player[] ShufflePlayers(Player[] list)
+    {
+        var rand = new System.Random();
+
+        for (var i = list.Length - 1; i >= 1; i--)
+        {
+            var j = rand.Next(i + 1);
+
+            (list[i], list[j]) = (list[j], list[i]);
+        }
+
+        return list;
     }
 
     private void AddListenersForButton()

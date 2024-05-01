@@ -97,7 +97,7 @@ public class ZoneController : MonoBehaviour
 
         _ventLayer = LayerMask.NameToLayer("VentZone");
         _attackLayer = LayerMask.NameToLayer("AttackZone");
-        _isImposter = (bool)PhotonNetwork.LocalPlayer.CustomProperties["isImposter"];
+        _isImposter = (bool)PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("isImposter");
 
         VentButton.gameObject.SetActive(false);
         SabotageButton.gameObject.SetActive(false);
