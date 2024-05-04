@@ -37,12 +37,17 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     [SerializeField] private TextMeshProUGUI SecondTextEndGame;
     [SerializeField] private GameObject PanelEndGame;
 
-    private int _maxTasks = 1;
+    private int _maxTasks = 5;
     private int _currentTask = 0;
     private GameObject _player;
     private float _coefForMap = 12.0f;
 
+    private Dictionary<int, Player> _players;
+
     private List<int> _impostors = new();
+    private List<int> _deads = new();
+    private List<int> _disconnects = new();
+    private List<int> _kicked = new();
 
 
     private Dictionary<int, float[]> positionForSpawn = new ()
@@ -89,6 +94,8 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         zone.GetComponent<ZoneController>().SabotageButton = SabotageButton;
 
         TaskCount.text = $"{_currentTask}/{_maxTasks}";
+
+        _players = PhotonNetwork.CurrentRoom.Players;
     }
 
     private Vector2 GetPosSpawn()
@@ -127,6 +134,57 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         Debug.LogFormat("Player {0} left room", otherPlayer.NickName);
+
+
+        if (!_deads.Contains(otherPlayer.ActorNumber))
+        {
+            _disconnects.Add(otherPlayer.ActorNumber);
+        }
+        if (_impostors.Contains(otherPlayer.ActorNumber))
+        {
+            _impostors.Remove(otherPlayer.ActorNumber);
+        }
+
+        NoMorePlayers();
+    }
+
+    private void NoMorePlayers()
+    {
+        if (_impostors.Count == 0)
+        {
+            if (_impostors.Contains(PhotonNetwork.LocalPlayer.ActorNumber))
+            {
+                MainTextEndGame.text = "Defeat";
+                SecondTextEndGame.color = Color.red;
+            }
+            else
+            {
+                MainTextEndGame.text = "Victory";
+                SecondTextEndGame.color = Color.green;
+            }
+            SecondTextEndGame.text = "Impostor Disconneted";
+        }
+
+        var alives = _players.Count - _deads.Count - _disconnects.Count - _impostors.Count - _kicked.Count;
+
+        if (alives == 0)
+        {
+            if (_impostors.Contains(PhotonNetwork.LocalPlayer.ActorNumber))
+            {
+                MainTextEndGame.text = "Victory";
+                SecondTextEndGame.color = Color.green;
+            }
+            else
+            {
+                MainTextEndGame.text = "Defeat";
+                SecondTextEndGame.color = Color.red;
+            }
+            SecondTextEndGame.text = "Crewmates Disconnected";
+        }
+
+        PanelEndGame.SetActive(true);
+        StartCoroutine(ExitGame());
+
     }
 
     public void OnEvent(EventData photonEvent)
@@ -137,6 +195,10 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
         if (photonEvent.Code == 99)
         {
+            _deads.Add(PhotonNetwork.LocalPlayer.ActorNumber);
+
+            ManyImpostors();
+
             var killerID = (int)photonEvent.CustomData;
 
             StartCoroutine(DisplayDeathScreen(killerID));
@@ -171,26 +233,48 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
             if (_currentTask >= _maxTasks)
             {
-                StartEndGame();
+                AllTaskCompleted();
             }
 
         }
     }
 
-    private void StartEndGame()
+    private void ManyImpostors()
+    {
+        var alives = _players.Count - _deads.Count - _disconnects.Count - _impostors.Count - _kicked.Count;
+
+        if (_impostors.Count >= alives)
+        {
+            if (_impostors.Contains(PhotonNetwork.LocalPlayer.ActorNumber))
+            {
+                MainTextEndGame.text = "Victory";
+                SecondTextEndGame.color = Color.green;
+            }
+            else
+            {
+                MainTextEndGame.text = "Defeat";
+                SecondTextEndGame.color = Color.red;
+            }
+            SecondTextEndGame.text = "Crewmates Eliminated";
+
+            PanelEndGame.SetActive(true);
+            StartCoroutine(ExitGame());
+        }
+    }
+
+    private void AllTaskCompleted()
     {
         if (_impostors.Contains(PhotonNetwork.LocalPlayer.ActorNumber))
         {
             MainTextEndGame.text = "Defeat";
-            SecondTextEndGame.text = "Completed Task";
             SecondTextEndGame.color = Color.red;
 
         } else
         {
             MainTextEndGame.text = "Victory";
-            SecondTextEndGame.text = "Completed Task";
             SecondTextEndGame.color = Color.green;
         }
+        SecondTextEndGame.text = "Completed Task";
 
         PanelEndGame.SetActive(true);
         StartCoroutine(ExitGame());
@@ -247,24 +331,25 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
             if (_impostors.Contains(actNum))
             {
                 resultText = $"{nickName} was The Impostor";
+                _impostors.Remove(actNum);
             }
             else
             {
                 resultText = $"{nickName} was not The Impostor";
             }
-        }
 
-        foreach (var view in PhotonNetwork.PhotonViewCollection)
-        {
-            if (!view.CompareTag("Player")) continue;
-
-            if (view.ControllerActorNr == actNum)
+            foreach (var view in PhotonNetwork.PhotonViewCollection)
             {
-                view.GetComponent<PlayerController>().IsKicked = true;
-                view.GetComponent<PlayerController>().IsDead = true;
+                if (!view.CompareTag("Player")) continue;
 
-                _impostors.Remove(actNum);
+                if (view.ControllerActorNr == actNum)
+                {
+                    view.GetComponent<PlayerController>().IsKicked = true;
+                    view.GetComponent<PlayerController>().IsDead = true;
+                }
             }
+
+            _kicked.Add(actNum);
         }
 
         var remainsText = $"{_impostors.Count} Impostor remains.";
@@ -273,8 +358,47 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
         OnVoteEnds?.Invoke(resultText, remainsText);
 
+        CheckAllKicked();
+
     }
 
+    private void CheckAllKicked()
+    {
+        if (_impostors.Count == 0)
+        {
+            if (_impostors.Contains(PhotonNetwork.LocalPlayer.ActorNumber))
+            {
+                MainTextEndGame.text = "Defeat";
+                SecondTextEndGame.color = Color.red;
+            }
+            else
+            {
+                MainTextEndGame.text = "Victory";
+                SecondTextEndGame.color = Color.green;
+            }
+            SecondTextEndGame.text = "Ejected Impostor";
+        }
+
+        var alives = _players.Count - _deads.Count - _disconnects.Count - _impostors.Count - _kicked.Count;
+
+        if (alives == 0)
+        {
+            if (_impostors.Contains(PhotonNetwork.LocalPlayer.ActorNumber))
+            {
+                MainTextEndGame.text = "Victory";
+                SecondTextEndGame.color = Color.green;
+            }
+            else
+            {
+                MainTextEndGame.text = "Defeat";
+                SecondTextEndGame.color = Color.red;
+            }
+            SecondTextEndGame.text = "Crewmates Eliminated";
+        }
+
+        PanelEndGame.SetActive(true);
+        StartCoroutine(ExitGame());
+    }
 
     private void DeadBodyDestroy(int id)
     {

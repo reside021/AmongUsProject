@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour, IPunObservable
 {
-    private MoveState _moveState = MoveState.Idle;
     private Rigidbody2D _rb;
     private Animator _animatorController;
     private SpriteRenderer _spriteRenderer;
@@ -20,7 +19,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     private LayerMask _playerLayer;
 
 
-    public float MoveSpeed = 15f;
+    private float _moveSpeed = 20f;
 
     public TextMeshProUGUI NickNameText;
 
@@ -121,7 +120,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
             var movement = new Vector2(moveHorizontal, moveVertical);
 
-            var move = MoveSpeed  * movement.normalized;
+            var move = _moveSpeed  * movement.normalized;
 
             _rb.velocity = move;
 
@@ -253,12 +252,5 @@ public class PlayerController : MonoBehaviour, IPunObservable
     {
         LevelManager.OnOpenUI -= OnOpenUI;
         KickUI.OnKickEnds -= OnKickEnds;
-    }
-
-    enum MoveState
-    {
-        Idle,
-        Walk,
-        Ghosting
     }
 }
