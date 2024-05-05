@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Execution : MonoBehaviour
 {
-    [SerializeField] private GameObject Electricity;
+    [SerializeField] private GameObject Task;
 
     private int _maxConnection = 4;
 
@@ -22,7 +22,7 @@ public class Execution : MonoBehaviour
             var notify = new TaskCompleted();
             notify.CompletedSuccessfully("Room", "Electricity");
 
-            Electricity.SetActive(false);
+            Task.SetActive(false);
         }
         
     }

@@ -402,7 +402,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba12dac07ca39e843a066f62a4d2e6d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MoveSpeed: 5
   NickNameText: {fileID: 5262882944379228754}
   VentArrow: {fileID: 0}
   DeadBodyPrefab: {fileID: 7105557607967098023, guid: 426b45c21492c284784394a3e9f96e49, type: 3}

@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Task Electricity
+  m_Name: Task
   m_Shader: {fileID: -6465566751694194690, guid: a118a929b123b0c49815c18d6b77b27e, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0

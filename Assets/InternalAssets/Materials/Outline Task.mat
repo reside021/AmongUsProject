@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Outline Task Electricity
+  m_Name: Outline Task
   m_Shader: {fileID: -6465566751694194690, guid: 53a7e0dfcb8fda14d871f88d02a0daa4, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
