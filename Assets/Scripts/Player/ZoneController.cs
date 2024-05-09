@@ -21,6 +21,7 @@ public class ZoneController : MonoBehaviour
     private LayerMask _ventLayer;
     private LayerMask _attackLayer;
     private bool _isImposter;
+    private bool _isBlockKill;
 
     private bool _isInVent
     {
@@ -75,11 +76,13 @@ public class ZoneController : MonoBehaviour
     }
 
     public static Action OnTaskUsed;
+    public static Action OnKilled;
 
 
     private void OnEnable()
     {
         VentsManager.ChangeVents += ChangeVents;
+        LevelManager.OnKillUnblocked += OnKillUnblocked;
     }
 
     void Start()
@@ -144,14 +147,19 @@ public class ZoneController : MonoBehaviour
 
     private void Kill()
     {
+        if (_isBlockKill) return;
+
         if (_targetForKill == null) return;
 
         var targetID = _targetForKill.GetComponent<PhotonView>().ControllerActorNr;
         var killerID = transform.parent.GetComponent<PhotonView>().ViewID;
 
-        var options = new RaiseEventOptions { TargetActors = new int[] { targetID } };
+        var options = new RaiseEventOptions { Receivers = ReceiverGroup.All };
         var sendOptions = new SendOptions { Reliability = true };
-        PhotonNetwork.RaiseEvent(99, killerID, options, sendOptions);
+        PhotonNetwork.RaiseEvent(99, targetID, options, sendOptions);
+
+        OnKilled?.Invoke();
+        _isBlockKill = true;
 
         _targetForKill.GetComponent<SpriteRenderer>().material = PlayerMat;
         _targetForKill = null;
@@ -330,9 +338,16 @@ public class ZoneController : MonoBehaviour
     }
 
 
+    private void OnKillUnblocked()
+    {
+        _isBlockKill = false;
+    }
+
 
     private void OnDisable()
     {
         VentsManager.ChangeVents -= ChangeVents;
+        LevelManager.OnKillUnblocked -= OnKillUnblocked;
     }
+
 }

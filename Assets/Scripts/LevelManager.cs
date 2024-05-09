@@ -36,6 +36,8 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     [SerializeField] private TextMeshProUGUI MainTextEndGame;
     [SerializeField] private TextMeshProUGUI SecondTextEndGame;
     [SerializeField] private GameObject PanelEndGame;
+    [SerializeField] private GameObject TimerKillBlock;
+    [SerializeField] private TextMeshProUGUI text;
 
     private int _maxTasks = 5;
     private int _currentTask = 0;
@@ -63,12 +65,14 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public static Action<int, int> OnPlayerVoted;
     public static Action<string, string> OnVoteEnds;
     public static Action OnOpenUI;
+    public static Action OnKillUnblocked;
 
 
     private void OnEnable()
     {
         base.OnEnable();
         TabletUI.OnKickPlayer += OnKickPlayer;
+        ZoneController.OnKilled += OnKilled;
     }
 
 
@@ -162,6 +166,7 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
                 SecondTextEndGame.color = Color.green;
             }
             SecondTextEndGame.text = "Impostor Disconneted";
+            StartCoroutine(ActivateEndGame());
         }
 
         var alives = _players.Count - _deads.Count - _disconnects.Count - _impostors.Count - _kicked.Count;
@@ -179,10 +184,8 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
                 SecondTextEndGame.color = Color.red;
             }
             SecondTextEndGame.text = "Crewmates Disconnected";
+            StartCoroutine(ActivateEndGame());
         }
-
-        PanelEndGame.SetActive(true);
-        StartCoroutine(ExitGame());
 
     }
 
@@ -198,10 +201,13 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
             ManyImpostors();
 
-            var killerID = (int)photonEvent.CustomData;
+            var targetID = (int)photonEvent.CustomData;
 
-            StartCoroutine(DisplayDeathScreen(killerID));
-            _player.GetComponent<PlayerController>().IsDead = true;
+            if (targetID == PhotonNetwork.LocalPlayer.ActorNumber)
+            {
+                StartCoroutine(DisplayDeathScreen(targetID));
+                _player.GetComponent<PlayerController>().IsDead = true;
+            }
         }
         if (photonEvent.Code == 100)
         {
@@ -225,10 +231,14 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         {
             var data = photonEvent.CustomData as Dictionary<string, string>;
             var sender = photonEvent.Sender;
+            text.text = $"data - {data} | sender - {sender}\n";
 
-
+            
             _currentTask++;
             TaskCount.text = $"{_currentTask}/{_maxTasks}";
+
+            Debug.Log($"current - {_currentTask} | max - {_maxTasks}");
+            text.text = $"current - {_currentTask} | max - {_maxTasks}";
 
             if (_currentTask >= _maxTasks)
             {
@@ -256,8 +266,7 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
             }
             SecondTextEndGame.text = "Crewmates Eliminated";
 
-            PanelEndGame.SetActive(true);
-            StartCoroutine(ExitGame());
+            StartCoroutine(ActivateEndGame());
         }
     }
 
@@ -275,8 +284,10 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
         SecondTextEndGame.text = "Completed Task";
 
-        PanelEndGame.SetActive(true);
-        StartCoroutine(ExitGame());
+        Debug.Log("TASK COMPLETED");
+        text.text = "TASK COMPLETED";
+
+        StartCoroutine(ActivateEndGame());
     }
 
     IEnumerator ExitGame()
@@ -296,7 +307,7 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         VotingUIAnimator.SetTrigger("OpenVotingUI");
     }
 
-    IEnumerator DisplayDeathScreen(int killerID)
+    IEnumerator DisplayDeathScreen(int targetID)
     {
         //var objects = GameObject.FindGameObjectsWithTag("Player");
         //var gameObject = objects.First(x => x.GetComponent<PhotonView>().ViewID == killerID);
@@ -355,9 +366,13 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
         Kick.SetActive(true);
 
+        _player.transform.position = GetPosSpawn();
+
         OnVoteEnds?.Invoke(resultText, remainsText);
 
         CheckAllKicked();
+
+        StartCoroutine(TimerBlock());
 
     }
 
@@ -376,6 +391,7 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
                 SecondTextEndGame.color = Color.green;
             }
             SecondTextEndGame.text = "Ejected Impostor";
+            StartCoroutine(ActivateEndGame());
         }
 
         var alives = _players.Count - _deads.Count - _disconnects.Count - _impostors.Count - _kicked.Count;
@@ -393,8 +409,13 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
                 SecondTextEndGame.color = Color.red;
             }
             SecondTextEndGame.text = "Crewmates Eliminated";
+            StartCoroutine(ActivateEndGame());
         }
+    }
 
+    IEnumerator ActivateEndGame()
+    {
+        yield return new WaitForSeconds(5);
         PanelEndGame.SetActive(true);
         StartCoroutine(ExitGame());
     }
@@ -419,9 +440,36 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
     }
 
+
+    private void OnKilled()
+    {
+        StartCoroutine(TimerBlock());
+    }
+
+    IEnumerator TimerBlock()
+    {
+        TimerKillBlock.SetActive(true);
+
+        var timer = 30;
+
+        while (timer > -1)
+        {
+            TimerKillBlock.GetComponent<TextMeshProUGUI>().text = timer.ToString();
+            timer--;
+            yield return new WaitForSeconds(1);
+        }
+
+        TimerKillBlock.SetActive(false);
+
+        OnKillUnblocked?.Invoke();
+
+    }
+
     private void OnDisable()
     {
         base.OnDisable();
         TabletUI.OnKickPlayer -= OnKickPlayer;
+        ZoneController.OnKilled -= OnKilled;
     }
+
 }

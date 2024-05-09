@@ -22,6 +22,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public Animator LeftFireController;
     public Animator RightFireController;
 
+    public TextMeshProUGUI text;
+
     private Dictionary<int, bool> _readyStatePlayer = new();
     private bool _isReady = false;
     private Dictionary<int, Vector3> positionForSpawn = new Dictionary<int, Vector3>()
@@ -51,6 +53,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
             StartGameBtn.gameObject.SetActive(true);
             Spawn();
         }
+
+        PhotonNetwork.LocalPlayer.CustomProperties.Clear();
     }
 
     #region Methods
@@ -78,8 +82,9 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
             if (PhotonNetwork.LocalPlayer.IsMasterClient)
             {
                 var players = ShufflePlayers(PhotonNetwork.PlayerList);
+                Debug.Log($"Players.Length = {players.Length}");
 
-                RaiseEventOptions options = new RaiseEventOptions();
+                RaiseEventOptions options = new();
 
                 if (players.Length < 6)
                 {
@@ -89,6 +94,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
                 {
                     options.TargetActors = new int[] { players[0].ActorNumber, players[1].ActorNumber };
                 }
+
+                Debug.Log($"options.TargetActors = {options.TargetActors.Length}");
 
                 var sendOptions = new SendOptions { Reliability = true };
                 PhotonNetwork.RaiseEvent(43, true, options, sendOptions);
@@ -211,6 +218,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
         if (photonEvent.Code == 43)
         {
+            text.text = $"Получена рассылка ролей: {photonEvent.CustomData}\n";
+            text.text = $"ActorNumber = {PhotonNetwork.LocalPlayer.ActorNumber}\n";
             Debug.Log($"Получена рассылка ролей: {photonEvent.CustomData}");
             var hT = new ExitGames.Client.Photon.Hashtable();
             hT["isImposter"] = (bool)photonEvent.CustomData;
