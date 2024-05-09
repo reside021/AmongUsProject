@@ -22,7 +22,7 @@ public class Execution : MonoBehaviour
             var notify = new TaskCompleted();
             notify.CompletedSuccessfully("Room", "Electricity");
 
-            Task.SetActive(false);
+            Destroy(Task);
         }
         
     }

@@ -12,6 +12,7 @@ public class ZoneController : MonoBehaviour
     private GameObject _targetForKill;
     private GameObject _targetForVent;
     private GameObject _targetForDeadBody;
+    private GameObject _targerForTask;
     private Button _killBtn;
     private Button _ventBtn;
     private Button _useBtn;
@@ -120,7 +121,9 @@ public class ZoneController : MonoBehaviour
 
     private void Use()
     {
-        OnTaskUsed?.Invoke();
+        if (_targerForTask == null) return;
+
+        _targerForTask.GetComponent<ShowTask>().Display();
     }
 
     private void Report()
@@ -240,8 +243,12 @@ public class ZoneController : MonoBehaviour
 
         if (other.CompareTag("Task"))
         {
-            other.gameObject.GetComponent<SpriteRenderer>().material = OutlineTaskElectricity;
-            UseButton.interactable = true;
+            if (_targerForTask == null)
+            {
+                _targerForTask = other.gameObject;
+                other.gameObject.GetComponent<SpriteRenderer>().material = OutlineTaskElectricity;
+                UseButton.interactable = true;
+            }
         }
 
 
@@ -291,7 +298,10 @@ public class ZoneController : MonoBehaviour
 
         if (other.CompareTag("Task"))
         {
+            if (_targerForTask == null) return;
+
             other.gameObject.GetComponent<SpriteRenderer>().material = TaskElectricity;
+            _targerForTask = null;
             UseButton.interactable = false;
         }
 

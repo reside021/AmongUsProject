@@ -7,6 +7,7 @@ public class SelfClose : MonoBehaviour
     {
         GetComponent<Button>().onClick.AddListener(() => {
             gameObject.SetActive(false);
+            Destroy(gameObject);
         });
     }
 }

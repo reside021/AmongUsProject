@@ -69,7 +69,6 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         base.OnEnable();
         TabletUI.OnKickPlayer += OnKickPlayer;
-        ZoneController.OnTaskUsed += OnTaskUsed;
     }
 
 
@@ -420,21 +419,9 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
     }
 
-
-    private void OnTaskUsed()
-    {
-        var taskCount = Tasks.childCount;
-
-        int indexTask = UnityEngine.Random.Range(0, taskCount);
-
-        var task = Tasks.GetChild(indexTask);
-
-        task.gameObject.SetActive(true);
-    }
-
     private void OnDisable()
     {
+        base.OnDisable();
         TabletUI.OnKickPlayer -= OnKickPlayer;
-        ZoneController.OnTaskUsed -= OnTaskUsed;
     }
 }

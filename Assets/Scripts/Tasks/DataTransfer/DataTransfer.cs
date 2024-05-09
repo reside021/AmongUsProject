@@ -95,7 +95,7 @@ public class DataTransfer : MonoBehaviour
         var notify = new TaskCompleted();
         notify.CompletedSuccessfully("Room", "Download");
 
-        Task.SetActive(false);
+        Destroy(Task);
     }
 
     private void UpdateProgressBar(float value)

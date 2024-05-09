@@ -655,6 +655,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3583144322725008804, guid: 60c479796932d1640834dc7578dbaa71, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7927541886888172780, guid: 60c479796932d1640834dc7578dbaa71, type: 3}
       propertyPath: m_Name
       value: DataDownload
