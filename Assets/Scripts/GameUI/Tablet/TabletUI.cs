@@ -65,7 +65,6 @@ public class TabletUI : MonoBehaviour
         CheckUsersCount();
         SaveListPlayer();
 
-        _votingSheet[SKIP] = new List<int>();
 
 
     }
@@ -155,12 +154,6 @@ public class TabletUI : MonoBehaviour
 
     #endregion
 
-
-
-    
-
-    
-
     #region CallbackMethods
 
     private void CheckStatusMineDead()
@@ -176,6 +169,8 @@ public class TabletUI : MonoBehaviour
     }
     private void CreateTabletContent(int finderID)
     {
+        _votingSheet[SKIP] = new List<int>();
+
         var index = -1;
 
         foreach (var player in _players)
@@ -286,8 +281,6 @@ public class TabletUI : MonoBehaviour
 
         var actNumForKick = GetPlayerForKick();
 
-
-
         var currentTime = _proceedingIn;
 
         while (currentTime > -1)
@@ -300,8 +293,6 @@ public class TabletUI : MonoBehaviour
         OnKickPlayer?.Invoke(actNumForKick);
 
         this.transform.parent.GetComponent<Animator>().SetTrigger("CloseVotingUI");
-
-        ResetTablet();
     }
 
     #endregion
@@ -391,6 +382,8 @@ public class TabletUI : MonoBehaviour
             blockSkipped.GetChild(i).gameObject.SetActive(false);
         }
 
+        ChatBlock.SetActive(false);
+
         var msgInChat = new Transform[Content.childCount];
 
         for (var i = 0; i < Content.childCount; i++)
@@ -402,6 +395,8 @@ public class TabletUI : MonoBehaviour
         {
             DestroyImmediate(msgInChat[i].gameObject);
         }
+
+        _votingSheet.Clear();
     }
 
 
@@ -413,6 +408,8 @@ public class TabletUI : MonoBehaviour
         _votedPlayerCount = 0;
 
         _isVoted = false;
+
+        ResetTablet();
 
         CheckStatusMineDead();
         CreateTabletContent(finderID);

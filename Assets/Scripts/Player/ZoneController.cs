@@ -76,13 +76,13 @@ public class ZoneController : MonoBehaviour
     }
 
     public static Action OnTaskUsed;
-    public static Action OnKilled;
 
 
     private void OnEnable()
     {
         VentsManager.ChangeVents += ChangeVents;
         LevelManager.OnKillUnblocked += OnKillUnblocked;
+        LevelManager.OnKillBlocked += OnKillBlocked;
     }
 
     void Start()
@@ -103,17 +103,21 @@ public class ZoneController : MonoBehaviour
         _attackLayer = LayerMask.NameToLayer("AttackZone");
         _isImposter = (bool)PhotonNetwork.LocalPlayer.CustomProperties.ContainsKey("isImposter");
 
+
         VentButton.gameObject.SetActive(false);
-        SabotageButton.gameObject.SetActive(false);
 
         if (!_isImposter)
         {
-            KillButton.gameObject.SetActive(false);
+            KillButton.gameObject.SetActive(false); 
+            SabotageButton.gameObject.SetActive(false);
         } else
         {
             var options = new RaiseEventOptions { Receivers = ReceiverGroup.All };
             var sendOptions = new SendOptions { Reliability = true };
             PhotonNetwork.RaiseEvent(98, true, options, sendOptions);
+
+            UseButton.gameObject.SetActive(false);
+            SabotageButton.gameObject.SetActive(true);
         }
 
     }
@@ -157,9 +161,6 @@ public class ZoneController : MonoBehaviour
         var options = new RaiseEventOptions { Receivers = ReceiverGroup.All };
         var sendOptions = new SendOptions { Reliability = true };
         PhotonNetwork.RaiseEvent(99, targetID, options, sendOptions);
-
-        OnKilled?.Invoke();
-        _isBlockKill = true;
 
         _targetForKill.GetComponent<SpriteRenderer>().material = PlayerMat;
         _targetForKill = null;
@@ -269,9 +270,9 @@ public class ZoneController : MonoBehaviour
                 _targetForVent = other.gameObject;
 
                 other.gameObject.GetComponent<SpriteRenderer>().material = OutlineVentMat;
-                UseButton.gameObject.SetActive(false);
                 VentButton.gameObject.SetActive(true);
                 VentButton.interactable = true;
+                SabotageButton.gameObject.SetActive(false);
             }
         }
 
@@ -323,7 +324,7 @@ public class ZoneController : MonoBehaviour
             _targetForVent = null;
             VentButton.interactable = false;
             VentButton.gameObject.SetActive(false);
-            UseButton.gameObject.SetActive(true);
+            SabotageButton.gameObject.SetActive(true);
         }
 
         if (other.CompareTag("Player"))
@@ -342,12 +343,18 @@ public class ZoneController : MonoBehaviour
     {
         _isBlockKill = false;
     }
+    private void OnKillBlocked()
+    {
+        _isBlockKill = true;
+    }
 
 
     private void OnDisable()
     {
         VentsManager.ChangeVents -= ChangeVents;
         LevelManager.OnKillUnblocked -= OnKillUnblocked;
+        LevelManager.OnKillBlocked -= OnKillBlocked;
     }
 
+    
 }

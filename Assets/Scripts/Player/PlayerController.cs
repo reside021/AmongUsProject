@@ -1,4 +1,5 @@
 using Photon.Pun;
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -29,6 +30,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
     public bool IsRightPlayer = true;
     public bool IsKicked;
+
 
     public bool IsDead
     {
@@ -170,7 +172,6 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
         var lengthAnim = _animatorController.GetCurrentAnimatorClipInfo(0)[0].clip.length;
         StartCoroutine(TranslateToGhostCoroutine(lengthAnim));
-
     }
 
 

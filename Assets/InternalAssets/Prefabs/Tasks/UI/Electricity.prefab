@@ -2079,8 +2079,8 @@ GameObject:
   - component: {fileID: 5071668201208751885}
   - component: {fileID: 4296254676377918638}
   - component: {fileID: 5571551156514979753}
-  - component: {fileID: 3045893221961531125}
   - component: {fileID: 199580348605118979}
+  - component: {fileID: 1248393135181025991}
   m_Layer: 5
   m_Name: Electricity
   m_TagString: Untagged
@@ -2147,18 +2147,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &3045893221961531125
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9123524228795499684}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b674a979cb694f04592cbf7e6ab414ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &199580348605118979
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2203,3 +2191,15 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1248393135181025991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9123524228795499684}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0e1c3f142f1eda44a94eb001d198195, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -1158,8 +1158,8 @@ GameObject:
   - component: {fileID: 512371813592940214}
   - component: {fileID: 7648235471039386807}
   - component: {fileID: 7807822457282339483}
-  - component: {fileID: 3898570992392082993}
   - component: {fileID: 5072283574877521956}
+  - component: {fileID: 4483854089355729921}
   m_Layer: 5
   m_Name: DataDownload
   m_TagString: Untagged
@@ -1226,18 +1226,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &3898570992392082993
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7927541886888172780}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b674a979cb694f04592cbf7e6ab414ae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &5072283574877521956
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1282,6 +1270,18 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4483854089355729921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7927541886888172780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0e1c3f142f1eda44a94eb001d198195, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8906893037767788273
 GameObject:
   m_ObjectHideFlags: 0

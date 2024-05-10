@@ -66,19 +66,19 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     public static Action<string, string> OnVoteEnds;
     public static Action OnOpenUI;
     public static Action OnKillUnblocked;
+    public static Action OnKillBlocked;
+    public static Action OnGhosted;
 
 
     private void OnEnable()
     {
         base.OnEnable();
         TabletUI.OnKickPlayer += OnKickPlayer;
-        ZoneController.OnKilled += OnKilled;
     }
 
 
     void Start()
     {
-
         var pos = GetPosSpawn();
 
         if (!PhotonNetwork.InRoom) return;
@@ -99,6 +99,8 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         TaskCount.text = $"{_currentTask}/{_maxTasks}";
 
         _players = PhotonNetwork.CurrentRoom.Players;
+
+        StartCoroutine(TimerBlock());
     }
 
     private Vector2 GetPosSpawn()
@@ -197,16 +199,23 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
         if (photonEvent.Code == 99)
         {
-            _deads.Add(PhotonNetwork.LocalPlayer.ActorNumber);
+
+            var targetID = (int)photonEvent.CustomData;
+            _deads.Add(targetID);
 
             ManyImpostors();
 
-            var targetID = (int)photonEvent.CustomData;
+            if (photonEvent.Sender == PhotonNetwork.LocalPlayer.ActorNumber)
+            {
+                StartCoroutine(TimerBlock());
+            }
 
             if (targetID == PhotonNetwork.LocalPlayer.ActorNumber)
             {
                 StartCoroutine(DisplayDeathScreen(targetID));
                 _player.GetComponent<PlayerController>().IsDead = true;
+                DisableGameButton();
+                OnGhosted?.Invoke();
             }
         }
         if (photonEvent.Code == 100)
@@ -231,14 +240,14 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         {
             var data = photonEvent.CustomData as Dictionary<string, string>;
             var sender = photonEvent.Sender;
-            text.text = $"data - {data} | sender - {sender}\n";
+            text.text += $"data - {data} | sender - {sender}\n";
 
             
             _currentTask++;
             TaskCount.text = $"{_currentTask}/{_maxTasks}";
 
             Debug.Log($"current - {_currentTask} | max - {_maxTasks}");
-            text.text = $"current - {_currentTask} | max - {_maxTasks}";
+            text.text += $"current - {_currentTask} | max - {_maxTasks}";
 
             if (_currentTask >= _maxTasks)
             {
@@ -246,6 +255,15 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
             }
 
         }
+    }
+
+    private void DisableGameButton()
+    {
+        KillButton.gameObject.SetActive(false);
+        VentButton.gameObject.SetActive(false);
+        UseButton.gameObject.SetActive(false);
+        ReportButton.gameObject.SetActive(false);
+        SabotageButton.gameObject.SetActive(false);
     }
 
     private void ManyImpostors()
@@ -285,7 +303,7 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         SecondTextEndGame.text = "Completed Task";
 
         Debug.Log("TASK COMPLETED");
-        text.text = "TASK COMPLETED";
+        text.text += "TASK COMPLETED";
 
         StartCoroutine(ActivateEndGame());
     }
@@ -366,6 +384,8 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
         Kick.SetActive(true);
 
+        ChangeChatChannel(actNum);
+
         _player.transform.position = GetPosSpawn();
 
         OnVoteEnds?.Invoke(resultText, remainsText);
@@ -374,6 +394,14 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
         StartCoroutine(TimerBlock());
 
+    }
+
+    private void ChangeChatChannel(int actNum)
+    {
+        if (PhotonNetwork.LocalPlayer.ActorNumber == actNum)
+        {
+            OnGhosted?.Invoke();
+        }
     }
 
     private void CheckAllKicked()
@@ -441,13 +469,10 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     }
 
 
-    private void OnKilled()
-    {
-        StartCoroutine(TimerBlock());
-    }
-
     IEnumerator TimerBlock()
     {
+        OnKillBlocked?.Invoke();
+
         TimerKillBlock.SetActive(true);
 
         var timer = 30;
@@ -469,7 +494,6 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     {
         base.OnDisable();
         TabletUI.OnKickPlayer -= OnKickPlayer;
-        ZoneController.OnKilled -= OnKilled;
     }
 
 }

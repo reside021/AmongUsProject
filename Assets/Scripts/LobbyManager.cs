@@ -218,8 +218,8 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
         if (photonEvent.Code == 43)
         {
-            text.text = $"Получена рассылка ролей: {photonEvent.CustomData}\n";
-            text.text = $"ActorNumber = {PhotonNetwork.LocalPlayer.ActorNumber}\n";
+            text.text += $"Получена рассылка ролей: {photonEvent.CustomData}\n";
+            text.text += $"ActorNumber = {PhotonNetwork.LocalPlayer.ActorNumber}\n";
             Debug.Log($"Получена рассылка ролей: {photonEvent.CustomData}");
             var hT = new ExitGames.Client.Photon.Hashtable();
             hT["isImposter"] = (bool)photonEvent.CustomData;

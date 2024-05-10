@@ -4,21 +4,30 @@ using Photon.Pun;
 using ExitGames.Client.Photon;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class ChatManager : MonoBehaviour, IChatClientListener
 {
 
     ChatClient chatClient;
 
-    public TMP_InputField TextMessageInputField;
-    public Button SendMessageBtn;
-    public TextMeshProUGUI CountCharacterText;
-    public Transform Content;
-    public GameObject MessageSenderPrefab;
-    public GameObject MessageReceiverPrefab;
+    [SerializeField] private TMP_InputField TextMessageInputField;
+    [SerializeField] private Button SendMessageBtn;
+    [SerializeField] private TextMeshProUGUI CountCharacterText;
+    [SerializeField] private Transform Content;
+    [SerializeField] private GameObject MessageSenderPrefab;
+    [SerializeField] private GameObject MessageReceiverPrefab;
 
     private const string CHANNEL = "GLOBAL";
+    private const string GHOSTCH = "GHOST_CHANNEL";
 
+    private string _currentChannel = CHANNEL;
+
+
+    private void OnEnable()
+    {
+        LevelManager.OnGhosted += OnGhosted;
+    }
 
     void Start()
     {
@@ -34,6 +43,14 @@ public class ChatManager : MonoBehaviour, IChatClientListener
         TextMessageInputField.onEndEdit.AddListener(InputOnEndEdit);
 
         SendMessageBtn.onClick.AddListener(SendMessage);
+    }
+
+
+    private void OnGhosted()
+    {
+        chatClient.Unsubscribe(new string[] { _currentChannel });
+        _currentChannel = GHOSTCH;
+        chatClient.Subscribe(_currentChannel);
     }
 
     private void InputOnEndEdit(string inputString)
@@ -53,8 +70,7 @@ public class ChatManager : MonoBehaviour, IChatClientListener
     {
         if (chatClient == null) return;
         if (string.IsNullOrEmpty(TextMessageInputField.text)) return;
-
-        chatClient.PublishMessage(CHANNEL, TextMessageInputField.text.Trim());
+        chatClient.PublishMessage(_currentChannel, TextMessageInputField.text.Trim());
 
         TextMessageInputField.text = string.Empty;
 
@@ -74,12 +90,12 @@ public class ChatManager : MonoBehaviour, IChatClientListener
     public void OnConnected()
     {
         Debug.Log("Connected");
-        chatClient.Subscribe(CHANNEL);
+        chatClient.Subscribe(_currentChannel);
     }
 
     public void OnDisconnected()
     {
-        chatClient.Unsubscribe(new string[] { CHANNEL });
+        chatClient.Unsubscribe(new string[] { _currentChannel });
     }
 
     public void OnGetMessages(string channelName, string[] senders, object[] messages)
@@ -144,6 +160,12 @@ public class ChatManager : MonoBehaviour, IChatClientListener
     void Update()
     {
         chatClient.Service();
+    }
+
+
+    private void OnDisable()
+    {
+        LevelManager.OnGhosted -= OnGhosted;
     }
 
 }
