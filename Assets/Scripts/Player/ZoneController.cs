@@ -254,6 +254,7 @@ public class ZoneController : MonoBehaviour
         {
             if (_targerForTask == null)
             {
+                if (_isImposter) return;
                 _targerForTask = other.gameObject;
                 other.gameObject.GetComponent<SpriteRenderer>().material = OutlineTaskElectricity;
                 UseButton.interactable = true;
@@ -308,6 +309,8 @@ public class ZoneController : MonoBehaviour
         if (other.CompareTag("Task"))
         {
             if (_targerForTask == null) return;
+
+            if (_isImposter) return;
 
             other.gameObject.GetComponent<SpriteRenderer>().material = TaskElectricity;
             _targerForTask = null;
