@@ -8,6 +8,7 @@ TagManager:
   - ActionZone
   - DeadBody
   - Task
+  - Report
   layers:
   - Default
   - TransparentFX

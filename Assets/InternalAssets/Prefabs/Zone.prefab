@@ -84,5 +84,7 @@ MonoBehaviour:
   OutlinePlayerMat: {fileID: 2100000, guid: ecd4a8ff6729d9b4384122ce17640839, type: 2}
   VentMat: {fileID: 2100000, guid: 31dec3bb1cfee304f9b5613a393baa13, type: 2}
   OutlineVentMat: {fileID: 2100000, guid: 432c1589bac4b4141bb42fb8d0e40fe7, type: 2}
-  TaskElectricity: {fileID: 2100000, guid: dd5e904b0e04ae5489c7014ee6c4874d, type: 2}
-  OutlineTaskElectricity: {fileID: 2100000, guid: d7a5ed20fa5bc694098eeef5518afd03, type: 2}
+  TaskElectricityMat: {fileID: 2100000, guid: dd5e904b0e04ae5489c7014ee6c4874d, type: 2}
+  OutlineTaskElectricityMat: {fileID: 2100000, guid: d7a5ed20fa5bc694098eeef5518afd03, type: 2}
+  ReportMat: {fileID: 2100000, guid: 4f02fff8fbc6f8e4186fcae458fe1952, type: 2}
+  OutlineReportMat: {fileID: 2100000, guid: 8c42c531f348c6944af00f14887f571b, type: 2}

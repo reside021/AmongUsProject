@@ -25,8 +25,10 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     [SerializeField] private GameObject KillScene;
     [SerializeField] private GameObject Zone;
     [SerializeField] private GameObject DeadBodyReported;
+    [SerializeField] private GameObject Report;
     [SerializeField] private Animator VotingUIAnimator;
     [SerializeField] private Animator DeadBodyRepAnimator;
+    [SerializeField] private Animator ReportAnimator;
     [SerializeField] private GameObject Kick;
     [SerializeField] private Transform PlayerOnMap;
     [SerializeField] private Transform ZeroPointGlobal;
@@ -228,6 +230,13 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
             DeadBodyDestroy(murderedID);
             StartCoroutine(DisplayBeforeVoting());
         }
+        if (photonEvent.Code == 101)
+        {
+            var reportingID = (int)photonEvent.CustomData;
+            OnOpenUI?.Invoke();
+            OnTabletOpened?.Invoke(reportingID);
+            StartCoroutine(DisplayReporting());
+        }
         if (photonEvent.Code == 10)
         {
             var data = (int)photonEvent.CustomData;
@@ -322,6 +331,16 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         DeadBodyRepAnimator.Play(0);
         yield return new WaitForSeconds(lenghAnimReported);
         DeadBodyReported.SetActive(false);
+        VotingUIAnimator.SetTrigger("OpenVotingUI");
+    }
+
+    IEnumerator DisplayReporting()
+    {
+        Report.SetActive(true);
+        var lenghAnimReported = ReportAnimator.GetCurrentAnimatorStateInfo(0).length;
+        ReportAnimator.Play(0);
+        yield return new WaitForSeconds(lenghAnimReported);
+        Report.SetActive(false);
         VotingUIAnimator.SetTrigger("OpenVotingUI");
     }
 
@@ -424,7 +443,7 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
         var alives = _players.Count - _deads.Count - _disconnects.Count - _impostors.Count - _kicked.Count;
 
-        if (alives == 0)
+        if (alives == _impostors.Count)
         {
             if (_impostors.Contains(PhotonNetwork.LocalPlayer.ActorNumber))
             {

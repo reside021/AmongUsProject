@@ -22,6 +22,7 @@ public class ZoneController : MonoBehaviour
     private LayerMask _attackLayer;
     private bool _isImposter;
     private bool _isBlockKill;
+    private bool _isReporting;
 
     private bool _isInVent
     {
@@ -41,8 +42,10 @@ public class ZoneController : MonoBehaviour
     [SerializeField] private Material OutlinePlayerMat;
     [SerializeField] private Material VentMat;
     [SerializeField] private Material OutlineVentMat;
-    [SerializeField] private Material TaskElectricity;
-    [SerializeField] private Material OutlineTaskElectricity;
+    [SerializeField] private Material TaskElectricityMat;
+    [SerializeField] private Material OutlineTaskElectricityMat;
+    [SerializeField] private Material ReportMat;
+    [SerializeField] private Material OutlineReportMat;
 
 
     public Button KillButton
@@ -128,6 +131,16 @@ public class ZoneController : MonoBehaviour
 
     private void Use()
     {
+        if (_isReporting)
+        {
+            var reportingID = transform.parent.GetComponent<PhotonView>().ViewID;
+
+            var options = new RaiseEventOptions { Receivers = ReceiverGroup.All };
+            var sendOptions = new SendOptions { Reliability = true };
+            PhotonNetwork.RaiseEvent(101, reportingID, options, sendOptions);
+            return;
+        }
+
         if (_targerForTask == null) return;
 
         _targerForTask.GetComponent<ShowTask>().Display();
@@ -256,9 +269,16 @@ public class ZoneController : MonoBehaviour
             {
                 if (_isImposter) return;
                 _targerForTask = other.gameObject;
-                other.gameObject.GetComponent<SpriteRenderer>().material = OutlineTaskElectricity;
+                other.gameObject.GetComponent<SpriteRenderer>().material = OutlineTaskElectricityMat;
                 UseButton.interactable = true;
             }
+        }
+
+        if (other.CompareTag("Report"))
+        {
+            other.gameObject.GetComponent<SpriteRenderer>().material = OutlineReportMat;
+            UseButton.interactable = true;
+            _isReporting = true;
         }
 
 
@@ -312,9 +332,16 @@ public class ZoneController : MonoBehaviour
 
             if (_isImposter) return;
 
-            other.gameObject.GetComponent<SpriteRenderer>().material = TaskElectricity;
+            other.gameObject.GetComponent<SpriteRenderer>().material = TaskElectricityMat;
             _targerForTask = null;
             UseButton.interactable = false;
+        }
+
+        if (other.CompareTag("Report"))
+        {
+            other.gameObject.GetComponent<SpriteRenderer>().material = ReportMat;
+            UseButton.interactable = false;
+            _isReporting = false;
         }
 
         if (!_isImposter) return;

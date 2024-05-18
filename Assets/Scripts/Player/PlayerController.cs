@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     private Rigidbody2D _rb;
     private Animator _animatorController;
     private SpriteRenderer _spriteRenderer;
+    private AudioSource _audioSource;
     private PhotonView _view;
     private bool _isDead;
     private bool _isInVent = false;
@@ -20,7 +21,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
     private LayerMask _playerLayer;
 
 
-    private float _moveSpeed = 7.5f;
+    private float _moveSpeed = 8.5f;
 
     public TextMeshProUGUI NickNameText;
 
@@ -78,6 +79,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
         _animatorController = GetComponent<Animator>();
         _view = GetComponent<PhotonView>();
         _spriteRenderer = GetComponent<SpriteRenderer>();
+        _audioSource = GetComponent<AudioSource>();
         _ghostPlayerLayer = LayerMask.NameToLayer("GhostPlayer");
         _ventLayer = LayerMask.NameToLayer("VentZone");
         _playerLayer = LayerMask.NameToLayer("Player");
@@ -110,6 +112,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
             if (moveHorizontal == 0 && moveVertical == 0)
             {
                 _rb.velocity = Vector2.zero;
+                _audioSource.Stop();
                 if (!IsDead)
                 {
                     _animatorController.SetBool("Walk", false);
@@ -129,6 +132,11 @@ public class PlayerController : MonoBehaviour, IPunObservable
             if (!IsDead)
             {
                 _animatorController.SetBool("Walk", true);
+
+                if (!_audioSource.isPlaying)
+                {
+                    _audioSource.Play();
+                }
             }
 
         }
