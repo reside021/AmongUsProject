@@ -13,37 +13,49 @@ using TMPro;
 
 public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
 {
+    [SerializeField] private Camera Camera;
+
     [SerializeField] private GameObject PlayerPrefab;
     [SerializeField] private GameObject Cinemachine;
+    [SerializeField] private GameObject KillScene;
+    [SerializeField] private GameObject Zone;
+    [SerializeField] private GameObject DeadBodyReported;
+    [SerializeField] private GameObject Report;
+    [SerializeField] private GameObject Kick;
+    [SerializeField] private GameObject PanelEndGame;
+    [SerializeField] private GameObject TimerKillBlock;
+
+    [SerializeField] private Transform DeathPanel;
+    [SerializeField] private Transform PlayerOnMap;
+    [SerializeField] private Transform ZeroPointGlobal;
+    [SerializeField] private Transform ZeroPointMap;
+    [SerializeField] private Transform Tasks;
+
+    [SerializeField] private Animator VotingUIAnimator;
+    [SerializeField] private Animator DeadBodyRepAnimator;
+    [SerializeField] private Animator ReportAnimator;
+
     [SerializeField] private Button KillButton;
     [SerializeField] private Button VentButton;
     [SerializeField] private Button UseButton;
     [SerializeField] private Button ReportButton;
     [SerializeField] private Button SabotageButton;
-    [SerializeField] private Camera Camera;
-    [SerializeField] private Transform DeathPanel;
-    [SerializeField] private GameObject KillScene;
-    [SerializeField] private GameObject Zone;
-    [SerializeField] private GameObject DeadBodyReported;
-    [SerializeField] private GameObject Report;
-    [SerializeField] private Animator VotingUIAnimator;
-    [SerializeField] private Animator DeadBodyRepAnimator;
-    [SerializeField] private Animator ReportAnimator;
-    [SerializeField] private GameObject Kick;
-    [SerializeField] private Transform PlayerOnMap;
-    [SerializeField] private Transform ZeroPointGlobal;
-    [SerializeField] private Transform ZeroPointMap;
-    [SerializeField] private Transform Tasks;
+
     [SerializeField] private TextMeshProUGUI TaskCount;
     [SerializeField] private TextMeshProUGUI MainTextEndGame;
     [SerializeField] private TextMeshProUGUI SecondTextEndGame;
-    [SerializeField] private GameObject PanelEndGame;
-    [SerializeField] private GameObject TimerKillBlock;
     [SerializeField] private TextMeshProUGUI text;
+
+    [SerializeField] private AudioClip AudioSiren;
+    [SerializeField] private AudioClip AudioFind;
+
+
+    private GameObject _player;
+    private AudioSource _audioSource;
 
     private int _maxTasks = 5;
     private int _currentTask = 0;
-    private GameObject _player;
+
     private float _coefForMap = 12.0f;
 
     private Dictionary<int, Player> _players;
@@ -101,6 +113,8 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         TaskCount.text = $"{_currentTask}/{_maxTasks}";
 
         _players = PhotonNetwork.CurrentRoom.Players;
+
+        _audioSource = GetComponent<AudioSource>();
 
         StartCoroutine(TimerBlock());
     }
@@ -225,8 +239,21 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
             var data = photonEvent.CustomData as Dictionary<string, int>;
             var finderID = data["finderID"];
             var murderedID = data["murderedID"];
+
+            if (finderID == _player.GetComponent<PhotonView>().ViewID)
+            {
+                _audioSource.clip = AudioFind;
+            } else
+            {
+                _audioSource.clip = AudioSiren;
+            }
+
             OnOpenUI?.Invoke();
             OnTabletOpened?.Invoke(finderID);
+
+            _audioSource.Play();
+            Debug.Log("PLAY");
+
             DeadBodyDestroy(murderedID);
             StartCoroutine(DisplayBeforeVoting());
         }

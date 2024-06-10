@@ -7,6 +7,8 @@ public class KickUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI IsImposterText;
     [SerializeField] private TextMeshProUGUI ImpostorRemainsText;
+    [SerializeField] private AudioSource AudioSource;
+    [SerializeField] private AudioClip AudioText;
 
     public static Action OnKickEnds;
 
@@ -28,6 +30,10 @@ public class KickUI : MonoBehaviour
     {
         yield return new WaitForSeconds(1);
 
+        AudioSource.clip = AudioText;
+        AudioSource.loop = true;
+        AudioSource.Play();
+
         foreach (var symbol in resultText)
         {
             IsImposterText.text += symbol;
@@ -38,6 +44,8 @@ public class KickUI : MonoBehaviour
             ImpostorRemainsText.text += symbol;
             yield return new WaitForSeconds(0.2f);
         }
+
+        AudioSource.loop = false;
 
         yield return new WaitForSeconds(3);
 

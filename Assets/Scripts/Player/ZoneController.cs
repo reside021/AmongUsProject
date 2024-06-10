@@ -9,6 +9,8 @@ using UnityEngine.UI;
 
 public class ZoneController : MonoBehaviour
 {
+    private AudioSource _audioSource;
+
     private GameObject _targetForKill;
     private GameObject _targetForVent;
     private GameObject _targetForDeadBody;
@@ -24,6 +26,21 @@ public class ZoneController : MonoBehaviour
     private bool _isBlockKill;
     private bool _isReporting;
 
+
+
+    [SerializeField] private Material PlayerMat;
+    [SerializeField] private Material OutlinePlayerMat;
+    [SerializeField] private Material VentMat;
+    [SerializeField] private Material OutlineVentMat;
+    [SerializeField] private Material TaskElectricityMat;
+    [SerializeField] private Material OutlineTaskElectricityMat;
+    [SerializeField] private Material ReportMat;
+    [SerializeField] private Material OutlineReportMat;
+
+    [SerializeField] private AudioClip AudioKill;
+    [SerializeField] private AudioClip AudioVent;
+
+
     private bool _isInVent
     {
         get
@@ -36,17 +53,6 @@ public class ZoneController : MonoBehaviour
             transform.parent.GetComponent<PlayerController>().IsInVent = value;
         }
     }
-
-
-    [SerializeField] private Material PlayerMat;
-    [SerializeField] private Material OutlinePlayerMat;
-    [SerializeField] private Material VentMat;
-    [SerializeField] private Material OutlineVentMat;
-    [SerializeField] private Material TaskElectricityMat;
-    [SerializeField] private Material OutlineTaskElectricityMat;
-    [SerializeField] private Material ReportMat;
-    [SerializeField] private Material OutlineReportMat;
-
 
     public Button KillButton
     {
@@ -90,6 +96,7 @@ public class ZoneController : MonoBehaviour
 
     void Start()
     {
+        _audioSource = GetComponent<AudioSource>();
 
         KillButton.onClick.AddListener(Kill);
         KillButton.interactable = false;
@@ -175,6 +182,10 @@ public class ZoneController : MonoBehaviour
         var sendOptions = new SendOptions { Reliability = true };
         PhotonNetwork.RaiseEvent(99, targetID, options, sendOptions);
 
+        _audioSource.clip = AudioKill;
+        _audioSource.Play();
+
+
         _targetForKill.GetComponent<SpriteRenderer>().material = PlayerMat;
         _targetForKill = null;
     }
@@ -199,6 +210,9 @@ public class ZoneController : MonoBehaviour
         var ventilation = _targetForVent.transform.parent;
         var animator = ventilation.GetComponent<Animator>();
         var interactWithPLayer = ventilation.GetComponent<InteractWithPlayer>();
+
+        _audioSource.clip = AudioVent;
+        _audioSource.Play();
 
         if (_isInVent)
         {

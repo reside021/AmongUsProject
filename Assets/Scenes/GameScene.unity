@@ -2374,6 +2374,7 @@ GameObject:
   m_Component:
   - component: {fileID: 237056287}
   - component: {fileID: 237056286}
+  - component: {fileID: 237056288}
   m_Layer: 0
   m_Name: LevelManager
   m_TagString: Untagged
@@ -2393,33 +2394,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec9e1c114fe30b340baef2a527f46239, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Camera: {fileID: 893289340}
   PlayerPrefab: {fileID: 7136423246141579728, guid: 9df04a77a45789945ac69f3cdfe08fea, type: 3}
   Cinemachine: {fileID: 1342263440}
+  KillScene: {fileID: 8044299206191682112, guid: 00f11f9227d638346a9807c6193cfe51, type: 3}
+  Zone: {fileID: 4511955653851246434, guid: cad734dcfd54d274c90a4f0d4f857c2f, type: 3}
+  DeadBodyReported: {fileID: 45327649}
+  Report: {fileID: 125168804}
+  Kick: {fileID: 1254639139}
+  PanelEndGame: {fileID: 203828705}
+  TimerKillBlock: {fileID: 1372116138}
+  DeathPanel: {fileID: 1498334834}
+  PlayerOnMap: {fileID: 513292858}
+  ZeroPointGlobal: {fileID: 1244861}
+  ZeroPointMap: {fileID: 614097678}
+  Tasks: {fileID: 474633819}
+  VotingUIAnimator: {fileID: 1377040896}
+  DeadBodyRepAnimator: {fileID: 45327653}
+  ReportAnimator: {fileID: 125168805}
   KillButton: {fileID: 996364849}
   VentButton: {fileID: 1966517450}
   UseButton: {fileID: 454151219}
   ReportButton: {fileID: 1135083997}
   SabotageButton: {fileID: 891622763}
-  Camera: {fileID: 893289340}
-  DeathPanel: {fileID: 1498334834}
-  KillScene: {fileID: 8044299206191682112, guid: 00f11f9227d638346a9807c6193cfe51, type: 3}
-  Zone: {fileID: 4511955653851246434, guid: cad734dcfd54d274c90a4f0d4f857c2f, type: 3}
-  DeadBodyReported: {fileID: 45327649}
-  Report: {fileID: 125168804}
-  VotingUIAnimator: {fileID: 1377040896}
-  DeadBodyRepAnimator: {fileID: 45327653}
-  ReportAnimator: {fileID: 125168805}
-  Kick: {fileID: 1254639139}
-  PlayerOnMap: {fileID: 513292858}
-  ZeroPointGlobal: {fileID: 1244861}
-  ZeroPointMap: {fileID: 614097678}
-  Tasks: {fileID: 474633819}
   TaskCount: {fileID: 1154330341}
   MainTextEndGame: {fileID: 1664611027}
   SecondTextEndGame: {fileID: 567485631}
-  PanelEndGame: {fileID: 203828705}
-  TimerKillBlock: {fileID: 1372116138}
   text: {fileID: 1771862882}
+  AudioSiren: {fileID: 8300000, guid: 69d99987b414b2946b9799c428bfd040, type: 3}
+  AudioFind: {fileID: 8300000, guid: 809cb5539d5c1a54a8988b13981a9a79, type: 3}
 --- !u!4 &237056287
 Transform:
   m_ObjectHideFlags: 0
@@ -2435,6 +2438,102 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &237056288
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 237056285}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &237583052
 GameObject:
   m_ObjectHideFlags: 0
@@ -12318,6 +12417,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   IsImposterText: {fileID: 123422318}
   ImpostorRemainsText: {fileID: 952893299}
+  AudioSource: {fileID: 237056288}
+  AudioText: {fileID: 8300000, guid: 87d3ef2ad543bff48b510f5554e9a1e5, type: 3}
 --- !u!1001 &1260190827
 PrefabInstance:
   m_ObjectHideFlags: 0

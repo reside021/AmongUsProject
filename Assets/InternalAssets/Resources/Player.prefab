@@ -407,6 +407,8 @@ MonoBehaviour:
   NickNameText: {fileID: 5262882944379228754}
   VentArrow: {fileID: 0}
   DeadBodyPrefab: {fileID: 7105557607967098023, guid: 426b45c21492c284784394a3e9f96e49, type: 3}
+  RunSound: {fileID: 8300000, guid: d3545ded9ae01974689b11bda9a43c0a, type: 3}
+  DeadSound: {fileID: 8300000, guid: 650c05d83ddca0443b93466ed2b10203, type: 3}
   IsRightPlayer: 1
   IsKicked: 0
 --- !u!95 &7136423246141579727
@@ -518,7 +520,7 @@ AudioSource:
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1
-  Loop: 1
+  Loop: 0
   Mute: 0
   Spatialize: 0
   SpatializePostEffects: 0

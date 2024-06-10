@@ -11,23 +11,23 @@ public class PlayerController : MonoBehaviour, IPunObservable
     private SpriteRenderer _spriteRenderer;
     private AudioSource _audioSource;
     private PhotonView _view;
-    private bool _isDead;
-    private bool _isInVent = false;
-    private bool _isOpenUI;
-    private bool _isAnimPlaying;
     private Camera _camera;
     private LayerMask _ghostPlayerLayer;
     private LayerMask _ventLayer;
     private LayerMask _playerLayer;
 
+    private bool _isDead;
+    private bool _isInVent = false;
+    private bool _isOpenUI;
+    private bool _isAnimPlaying;
 
     private float _moveSpeed = 8.5f;
 
-    public TextMeshProUGUI NickNameText;
-
-    public GameObject VentArrow;
-
-    public GameObject DeadBodyPrefab;
+    [SerializeField] private TextMeshProUGUI NickNameText;
+    [SerializeField] private GameObject VentArrow;
+    [SerializeField] private GameObject DeadBodyPrefab;
+    [SerializeField] private AudioClip RunSound;
+    [SerializeField] private AudioClip DeadSound;
 
     public bool IsRightPlayer = true;
     public bool IsKicked;
@@ -135,6 +135,7 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
                 if (!_audioSource.isPlaying)
                 {
+                    _audioSource.clip = RunSound;
                     _audioSource.Play();
                 }
             }
@@ -172,6 +173,9 @@ public class PlayerController : MonoBehaviour, IPunObservable
 
     private void Death()
     {
+        _audioSource.clip = DeadSound;
+        _audioSource.Play();
+
         _rb.velocity = Vector2.zero;
 
         _isAnimPlaying = true;
