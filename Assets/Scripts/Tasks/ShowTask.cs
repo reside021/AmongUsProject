@@ -4,7 +4,6 @@ public class ShowTask : MonoBehaviour
 {
     [SerializeField] private Transform TaskContainer;
 
-
     public void Display()
     {
         var taskCount = TaskContainer.childCount;

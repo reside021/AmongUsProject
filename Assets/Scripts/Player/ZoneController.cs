@@ -26,8 +26,6 @@ public class ZoneController : MonoBehaviour
     private bool _isBlockKill;
     private bool _isReporting;
 
-
-
     [SerializeField] private Material PlayerMat;
     [SerializeField] private Material OutlinePlayerMat;
     [SerializeField] private Material VentMat;
@@ -129,7 +127,6 @@ public class ZoneController : MonoBehaviour
             UseButton.gameObject.SetActive(false);
             SabotageButton.gameObject.SetActive(true);
         }
-
     }
 
     private void Sabotage()
@@ -391,7 +388,6 @@ public class ZoneController : MonoBehaviour
     {
         _isBlockKill = true;
     }
-
 
     private void OnDisable()
     {

@@ -143,20 +143,12 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
     }
     public override void OnLeftRoom()
     {
-        // current player left room
         SceneManager.LoadScene(1);
     }
 
-    public override void OnPlayerEnteredRoom(Player newPlayer)
-    {
-        Debug.LogFormat("Player {0} entered room", newPlayer.NickName);
-    }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
-        Debug.LogFormat("Player {0} left room", otherPlayer.NickName);
-
-
         if (!_deads.Contains(otherPlayer.ActorNumber))
         {
             _disconnects.Add(otherPlayer.ActorNumber);
@@ -228,7 +220,7 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
             if (targetID == PhotonNetwork.LocalPlayer.ActorNumber)
             {
-                StartCoroutine(DisplayDeathScreen(targetID));
+                StartCoroutine(DisplayDeathScreen());
                 _player.GetComponent<PlayerController>().IsDead = true;
                 DisableGameButton();
                 OnGhosted?.Invoke();
@@ -278,11 +270,9 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
             var sender = photonEvent.Sender;
             text.text += $"data - {data} | sender - {sender}\n";
 
-            
             _currentTask++;
             TaskCount.text = $"{_currentTask}/{_maxTasks}";
 
-            Debug.Log($"current - {_currentTask} | max - {_maxTasks}");
             text.text += $"current - {_currentTask} | max - {_maxTasks}";
 
             if (_currentTask >= _maxTasks)
@@ -338,7 +328,6 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         }
         SecondTextEndGame.text = "Completed Task";
 
-        Debug.Log("TASK COMPLETED");
         text.text += "TASK COMPLETED";
 
         StartCoroutine(ActivateEndGame());
@@ -371,11 +360,8 @@ public class LevelManager : MonoBehaviourPunCallbacks, IOnEventCallback
         VotingUIAnimator.SetTrigger("OpenVotingUI");
     }
 
-    IEnumerator DisplayDeathScreen(int targetID)
+    IEnumerator DisplayDeathScreen()
     {
-        //var objects = GameObject.FindGameObjectsWithTag("Player");
-        //var gameObject = objects.First(x => x.GetComponent<PhotonView>().ViewID == killerID);
-
         DeathPanel.gameObject.SetActive(true);
 
         var killScene = Instantiate(KillScene, DeathPanel);

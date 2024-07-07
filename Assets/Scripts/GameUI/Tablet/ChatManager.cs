@@ -4,7 +4,6 @@ using Photon.Pun;
 using ExitGames.Client.Photon;
 using UnityEngine.UI;
 using TMPro;
-using System;
 
 public class ChatManager : MonoBehaviour, IChatClientListener
 {
@@ -79,17 +78,16 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 
     public void DebugReturn(DebugLevel level, string message)
     {
-        Debug.Log($"lvl: {level} - msg: {message}");
+
     }
 
     public void OnChatStateChange(ChatState state)
     {
-        Debug.Log(state);
+
     }
 
     public void OnConnected()
     {
-        Debug.Log("Connected");
         chatClient.Subscribe(_currentChannel);
     }
 
@@ -132,28 +130,22 @@ public class ChatManager : MonoBehaviour, IChatClientListener
 
     public void OnSubscribed(string[] channels, bool[] results)
     {
-        foreach (var channel in channels)
-        {
-            Debug.Log($"Subscriped to {channel}");
-        }
+
     }
 
     public void OnUnsubscribed(string[] channels)
     {
-        foreach (var channel in channels)
-        {
-            Debug.Log($"Unsubscriped from {channel}");
-        }
+
     }
 
     public void OnUserSubscribed(string channel, string user)
     {
-        Debug.Log($"{user} subscriped to {channel}");
+
     }
 
     public void OnUserUnsubscribed(string channel, string user)
     {
-        Debug.Log($"{user} unsubscriped from {channel}");
+
     }
 
 

@@ -5,7 +5,6 @@ using Photon.Realtime;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
-using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -72,8 +71,7 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
         ReadyPlayerText.text = $"{readyPlayerCount}/{allPlayerCount}";
 
-        //if (allPlayerCount < 2 || readyPlayerCount < allPlayerCount)
-        if (readyPlayerCount < allPlayerCount)
+        if (allPlayerCount < 2 || readyPlayerCount < allPlayerCount)
         {
             StartGameBtn.interactable = false;
         }
@@ -82,7 +80,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
             if (PhotonNetwork.LocalPlayer.IsMasterClient)
             {
                 var players = ShufflePlayers(PhotonNetwork.PlayerList);
-                Debug.Log($"Players.Length = {players.Length}");
 
                 RaiseEventOptions options = new();
 
@@ -94,8 +91,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
                 {
                     options.TargetActors = new int[] { players[0].ActorNumber, players[1].ActorNumber };
                 }
-
-                Debug.Log($"options.TargetActors = {options.TargetActors.Length}");
 
                 var sendOptions = new SendOptions { Reliability = true };
                 PhotonNetwork.RaiseEvent(43, true, options, sendOptions);
@@ -183,7 +178,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
 
     public override void OnLeftRoom()
     {
-        // current player left room
         SceneManager.LoadScene(1);
     }
     public override void OnJoinedRoom()
@@ -220,7 +214,6 @@ public class LobbyManager : MonoBehaviourPunCallbacks, IOnEventCallback
         {
             text.text += $"Получена рассылка ролей: {photonEvent.CustomData}\n";
             text.text += $"ActorNumber = {PhotonNetwork.LocalPlayer.ActorNumber}\n";
-            Debug.Log($"Получена рассылка ролей: {photonEvent.CustomData}");
             var hT = new ExitGames.Client.Photon.Hashtable();
             hT["isImposter"] = (bool)photonEvent.CustomData;
             PhotonNetwork.LocalPlayer.CustomProperties = hT;
